@@ -4,7 +4,9 @@ const levels = [
     { cupCount: 3, timeLimit: 30 },
     { cupCount: 4, timeLimit: 60 },
     { cupCount: 4, timeLimit: 45 },
-    { cupCount: 5, timeLimit: 60 }
+    { cupCount: 5, timeLimit: 60 },
+    { cupCount: 5, timeLimit: 45 },
+    { cupCount: 6, timeLimit: 60 }
 ];
 
 let currentLevel = 0;
@@ -23,6 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const checkArrangementButton = document.getElementById('check-arrangement');
     checkArrangementButton.addEventListener('click', checkArrangement);
+
+    // Prevent page refresh
+    window.addEventListener('beforeunload', (event) => {
+        event.preventDefault();
+        event.returnValue = ''; // This triggers the confirmation dialog in most browsers
+    });
 });
 
 function startGame() {
@@ -169,9 +177,11 @@ function checkArrangement() {
 
     if (correctCount === correctOrder.length) {
         clearInterval(timerInterval);
-        showModal('Correct! Moving to the next level.');
-        currentLevel++;
-        if (currentLevel < levels.length) {
+        
+        // Check if it's the last level
+        if (currentLevel + 1 < levels.length) {
+            showModal('Correct! Moving to the next level.');
+            currentLevel++;
             startLevel();
         } else {
             showModal('Congratulations! You have completed all levels!');
