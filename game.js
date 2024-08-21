@@ -6,7 +6,12 @@ const levels = [
     { cupCount: 4, timeLimit: 45 },
     { cupCount: 5, timeLimit: 60 },
     { cupCount: 5, timeLimit: 45 },
-    { cupCount: 6, timeLimit: 60 }
+    { cupCount: 6, timeLimit: 60 },
+    { cupCount: 6, timeLimit: 45 },
+    { cupCount: 6, timeLimit: 30 },
+    { cupCount: 7, timeLimit: 60 },
+    { cupCount: 7, timeLimit: 45 },
+    { cupCount: 8, timeLimit: 60 }
 ];
 
 let currentLevel = 0;
