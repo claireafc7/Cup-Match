@@ -8,7 +8,10 @@ const levels = [
     { cupCount: 5, timeLimit: 45 },
     { cupCount: 6, timeLimit: 60 },
     { cupCount: 7, timeLimit: 60 },
-    { cupCount: 8, timeLimit: 60 }
+    { cupCount: 8, timeLimit: 60 },
+    { cupCount: 9, timeLimit: 60 },
+    { cupCount: 10, timeLimit: 60 }
+    }
 ];
 
 let currentLevel = 0;
@@ -56,7 +59,7 @@ function startLevel() {
 }
 
 function generateCups(count) {
-    const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown'];
+    const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown', 'beige', 'teal'];
     const selectedColors = colors.slice(0, count);
     return selectedColors.sort(() => Math.random() - 0.5);
 }
