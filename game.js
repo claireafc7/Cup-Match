@@ -5,7 +5,7 @@ const levels = [
     { cupCount: 4, timeLimit: 60 },
     { cupCount: 4, timeLimit: 45 },
     { cupCount: 5, timeLimit: 60 },
-    { cupCount: 4, timeLimit: 60, stacked: true } // New level with stacking
+    { cupCount: 4, timeLimit: 60, stacked: true } // New level with stacking enabled
 ];
 
 let currentLevel = 0;
@@ -24,12 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const checkArrangementButton = document.getElementById('check-arrangement');
     checkArrangementButton.addEventListener('click', checkArrangement);
-
-    // Prevent page refresh
-    window.addEventListener('beforeunload', (event) => {
-        event.preventDefault();
-        event.returnValue = ''; // This triggers the confirmation dialog in most browsers
-    });
 });
 
 function startGame() {
@@ -44,7 +38,7 @@ function startLevel() {
     document.getElementById('time-left').innerText = levelData.timeLimit;
 
     shuffledCups = generateCups(levelData.cupCount);
-    correctOrder = generateCorrectOrder(levelData);
+    correctOrder = [...shuffledCups].sort(() => Math.random() - 0.5);
 
     displayCupsInStack(shuffledCups);
     createCupSlots(levelData.cupCount, levelData.stacked);
@@ -58,15 +52,6 @@ function generateCups(count) {
     return selectedColors.sort(() => Math.random() - 0.5);
 }
 
-function generateCorrectOrder(levelData) {
-    if (levelData.stacked) {
-        // Example correct order for stacked level: two cups stacked in one slot, others in separate slots
-        return ['red', 'green', ['blue', 'yellow']];
-    } else {
-        return [...shuffledCups].sort(() => Math.random() - 0.5);
-    }
-}
-
 function displayCupsInStack(cups) {
     const stackContainer = document.getElementById('stack-container');
     stackContainer.innerHTML = '';
@@ -77,13 +62,11 @@ function displayCupsInStack(cups) {
     });
 }
 
-function createCupSlots(count, stacked = false) {
+function createCupSlots(count, stackingAllowed = false) {
     const arrangementContainer = document.getElementById('arrangement-container');
     arrangementContainer.innerHTML = '';
 
-    const slotCount = stacked ? count - 1 : count; // One less slot for stacked level
-
-    for (let i = 0; i < slotCount; i++) {
+    for (let i = 0; i < (stackingAllowed ? count - 1 : count); i++) { // Adjust number of slots if stacking is allowed
         const slotElement = document.createElement('div');
         slotElement.className = 'cup-slot';
         slotElement.setAttribute('data-index', i);
@@ -123,16 +106,23 @@ function drop(event) {
     event.preventDefault();
     const targetSlot = event.target;
 
+    // Check if the current level allows stacking
+    const levelData = levels[currentLevel];
+    const stackingAllowed = levelData.stacked;
+
     if (targetSlot.classList.contains('cup-slot') && selectedCupElement) {
         const targetCup = targetSlot.querySelector('.cup');
 
-        if (targetCup) {
+        if (stackingAllowed) {
+            // Allow stacking up to two cups per slot
             if (targetSlot.childElementCount < 2) {
-                // Allow stacking up to two cups per slot
                 targetSlot.appendChild(selectedCupElement);
             }
         } else {
-            targetSlot.appendChild(selectedCupElement);
+            // No stacking allowed, so only allow one cup per slot
+            if (!targetCup) {
+                targetSlot.appendChild(selectedCupElement);
+            }
         }
 
         selectedCupElement = null;
@@ -155,15 +145,22 @@ function touchMove(event) {
 }
 
 function touchEnd() {
+    const levelData = levels[currentLevel];
+    const stackingAllowed = levelData.stacked;
+
     if (draggedOverElement && draggedOverElement.classList.contains('cup-slot') && selectedCupElement) {
         const targetCup = draggedOverElement.querySelector('.cup');
 
-        if (targetCup) {
+        if (stackingAllowed) {
+            // Allow stacking for touch if stacking is allowed in the level
             if (draggedOverElement.childElementCount < 2) {
-                draggedOverElement.appendChild(selectedCupElement); // Allow stacking for touch
+                draggedOverElement.appendChild(selectedCupElement);
             }
         } else {
-            draggedOverElement.appendChild(selectedCupElement);
+            // No stacking allowed for touch
+            if (!targetCup) {
+                draggedOverElement.appendChild(selectedCupElement);
+            }
         }
 
         selectedCupElement = null;
@@ -178,31 +175,20 @@ function returnCupToStack(event) {
 
 function checkArrangement() {
     const arrangedCups = [...document.getElementById('arrangement-container').children].map(slot => {
-        const cupElements = [...slot.children];
-        return cupElements.length === 2
-            ? [cupElements[0].style.backgroundColor, cupElements[1].style.backgroundColor]
-            : cupElements.length === 1
-            ? cupElements[0].style.backgroundColor
-            : null;
+        const cupsInSlot = [...slot.querySelectorAll('.cup')];
+        return cupsInSlot.map(cup => cup.style.backgroundColor);
     });
 
     let correctCount = 0;
 
-    arrangedCups.forEach((arranged, index) => {
-        const expected = correctOrder[index];
-        if (Array.isArray(expected) && Array.isArray(arranged)) {
-            if (expected[0] === arranged[0] && expected[1] === arranged[1]) {
-                correctCount++;
-            }
-        } else if (expected === arranged) {
+    arrangedCups.forEach((colors, index) => {
+        if (colors.length === correctOrder[index].length && colors.every((color, i) => color === correctOrder[index][i])) {
             correctCount++;
         }
     });
 
     if (correctCount === correctOrder.length) {
         clearInterval(timerInterval);
-        
-        // Check if it's the last level
         if (currentLevel + 1 < levels.length) {
             showModal('Correct! Moving to the next level.');
             currentLevel++;
@@ -227,7 +213,7 @@ function startTimer(seconds) {
 
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
-            showModal('Time\'s up! Game over.');
+            showModal("Time's up! Game over.");
             endGame();
         } else if (timeLeft <= 10) {
             timeLeftElement.classList.add('warning');
