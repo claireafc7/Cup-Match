@@ -50,7 +50,7 @@ function startLevel() {
     document.getElementById('time-left').innerText = levelData.timeLimit;
 
     shuffledCups = generateCups(levelData.cupCount);
-    correctOrder = [...shuffledCups].sort(() => Math.random() - 0.5);
+    correctOrder = generateCorrectOrder(levelData.cupCount, levelData.slotCount);
 
     displayCupsInStack(shuffledCups);
     createCupSlots(levelData.slotCount, levelData.stacked);
@@ -62,6 +62,15 @@ function generateCups(count) {
     const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown', 'beige', 'teal'];
     const selectedColors = colors.slice(0, count);
     return selectedColors.sort(() => Math.random() - 0.5);
+}
+
+function generateCorrectOrder(cupCount, slotCount) {
+    // Randomly assign cups to slots; some slots may have multiple cups if stacking is enabled
+    const correctOrder = Array(slotCount).fill().map(() => []);
+    shuffledCups.forEach((cup, index) => {
+        correctOrder[index % slotCount].push(cup);
+    });
+    return correctOrder;
 }
 
 function displayCupsInStack(cups) {
@@ -216,7 +225,7 @@ function checkArrangement() {
             endGame();
         }
     } else {
-        showModal(`${correctCount} out of ${correctOrder.length} cups are in the correct position. Try again!`);
+        showModal(`${correctCount} out of ${correctOrder.length} slots are correct. Try again!`);
     }
 }
 
@@ -273,4 +282,3 @@ function showModal(message) {
 
     modal.style.display = 'block';
 }
-
