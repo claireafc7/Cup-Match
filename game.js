@@ -1,17 +1,17 @@
 const levels = [
-    { cupCount: 3, timeLimit: 60 },
-    { cupCount: 3, timeLimit: 45 },
-    { cupCount: 3, timeLimit: 30 },
-    { cupCount: 4, timeLimit: 60 },
-    { cupCount: 4, timeLimit: 45 },
-    { cupCount: 5, timeLimit: 60 },
-    { cupCount: 5, timeLimit: 45 },
-    { cupCount: 6, timeLimit: 60 },
-    { cupCount: 7, timeLimit: 60 },
-    { cupCount: 8, timeLimit: 60 },
-    { cupCount: 9, timeLimit: 60 },
-    { cupCount: 10, timeLimit: 60 }
-    }
+    { cupCount: 3, slotCount: 3, timeLimit: 60 },
+    { cupCount: 3, slotCount: 3, timeLimit: 45 },
+    { cupCount: 3, slotCount: 3, timeLimit: 30 },
+    { cupCount: 4, slotCount: 4, timeLimit: 60 },
+    { cupCount: 4, slotCount: 4, timeLimit: 45 },
+    { cupCount: 5, slotCount: 5, timeLimit: 60 },
+    { cupCount: 5, slotCount: 5, timeLimit: 45 },
+    { cupCount: 6, slotCount: 6, timeLimit: 60 },
+    { cupCount: 7, slotCount: 7, timeLimit: 60 },
+    { cupCount: 8, slotCount: 6, timeLimit: 60 }, // 8 cups, 6 slots
+    { cupCount: 8, slotCount: 6, timeLimit: 60, stacked: true }, // 8 cups, 6 slots, with stacking
+    { cupCount: 9, slotCount: 7, timeLimit: 60 }, 
+    { cupCount: 10, slotCount: 8, timeLimit: 60 } 
 ];
 
 let currentLevel = 0;
@@ -53,7 +53,7 @@ function startLevel() {
     correctOrder = [...shuffledCups].sort(() => Math.random() - 0.5);
 
     displayCupsInStack(shuffledCups);
-    createCupSlots(levelData.cupCount);
+    createCupSlots(levelData.slotCount, levelData.stacked);
 
     startTimer(levelData.timeLimit);
 }
@@ -74,7 +74,7 @@ function displayCupsInStack(cups) {
     });
 }
 
-function createCupSlots(count) {
+function createCupSlots(count, stackingAllowed = false) {
     const arrangementContainer = document.getElementById('arrangement-container');
     arrangementContainer.innerHTML = '';
 
@@ -83,7 +83,7 @@ function createCupSlots(count) {
         slotElement.className = 'cup-slot';
         slotElement.setAttribute('data-index', i);
         slotElement.addEventListener('dragover', dragOver);
-        slotElement.addEventListener('drop', drop);
+        slotElement.addEventListener('drop', (event) => drop(event, stackingAllowed));
         arrangementContainer.appendChild(slotElement);
     }
 }
@@ -114,19 +114,29 @@ function dragOver(event) {
     event.preventDefault();
 }
 
-function drop(event) {
+function drop(event, stackingAllowed) {
     event.preventDefault();
     const targetSlot = event.target;
 
     if (targetSlot.classList.contains('cup-slot') && selectedCupElement) {
         const targetCup = targetSlot.querySelector('.cup');
 
-        if (targetCup) {
-            // Swap cups between slots
-            selectedCupElement.parentElement.appendChild(targetCup);
+        if (stackingAllowed) {
+            // Allow stacking up to two cups per slot
+            if (targetSlot.childElementCount < 2) {
+                targetSlot.appendChild(selectedCupElement);
+            }
+        } else {
+            // No stacking allowed, so only allow one cup per slot
+            if (!targetCup) {
+                targetSlot.appendChild(selectedCupElement);
+            } else {
+                // Swap cups between slots
+                selectedCupElement.parentElement.appendChild(targetCup);
+                targetSlot.appendChild(selectedCupElement);
+            }
         }
 
-        targetSlot.appendChild(selectedCupElement);
         selectedCupElement = null;
     }
 }
@@ -147,15 +157,28 @@ function touchMove(event) {
 }
 
 function touchEnd() {
+    const levelData = levels[currentLevel];
+    const stackingAllowed = levelData.stacked;
+
     if (draggedOverElement && draggedOverElement.classList.contains('cup-slot') && selectedCupElement) {
         const targetCup = draggedOverElement.querySelector('.cup');
 
-        if (targetCup) {
-            // Swap cups between slots for touch
-            selectedCupElement.parentElement.appendChild(targetCup);
+        if (stackingAllowed) {
+            // Allow stacking for touch if stacking is allowed in the level
+            if (draggedOverElement.childElementCount < 2) {
+                draggedOverElement.appendChild(selectedCupElement);
+            }
+        } else {
+            // No stacking allowed for touch
+            if (!targetCup) {
+                draggedOverElement.appendChild(selectedCupElement);
+            } else {
+                // Swap cups for touch
+                selectedCupElement.parentElement.appendChild(targetCup);
+                draggedOverElement.appendChild(selectedCupElement);
+            }
         }
 
-        draggedOverElement.appendChild(selectedCupElement);
         selectedCupElement = null;
         draggedOverElement = null;
     }
@@ -168,14 +191,14 @@ function returnCupToStack(event) {
 
 function checkArrangement() {
     const arrangedCups = [...document.getElementById('arrangement-container').children].map(slot => {
-        const cup = slot.querySelector('.cup');
-        return cup ? cup.style.backgroundColor : null;
+        const cupsInSlot = [...slot.querySelectorAll('.cup')];
+        return cupsInSlot.map(cup => cup.style.backgroundColor);
     });
 
     let correctCount = 0;
 
-    arrangedCups.forEach((color, index) => {
-        if (color === correctOrder[index]) {
+    arrangedCups.forEach((colors, index) => {
+        if (colors.length === correctOrder[index].length && colors.every((color, i) => color === correctOrder[index][i])) {
             correctCount++;
         }
     });
@@ -250,3 +273,4 @@ function showModal(message) {
 
     modal.style.display = 'block';
 }
+
