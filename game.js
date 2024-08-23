@@ -8,9 +8,9 @@ const levels = [
     { cupCount: 5, slotCount: 5, timeLimit: 45 },
     { cupCount: 6, slotCount: 6, timeLimit: 60 },
     { cupCount: 7, slotCount: 7, timeLimit: 60 },
-    { cupCount: 8, slotCount: 6, timeLimit: 60 }, // 8 cups, 6 slots
-    { cupCount: 8, slotCount: 6, timeLimit: 60, stacked: true }, // 8 cups, 6 slots, with stacking
-    { cupCount: 9, slotCount: 7, timeLimit: 60 }, 
+    { cupCount: 8, slotCount: 6, timeLimit: 60 }, // 8 cups, 6 slots (requires stacking)
+    { cupCount: 8, slotCount: 6, timeLimit: 60, stacked: true }, // 8 cups, 6 slots, stacking enabled
+    { cupCount: 9, slotCount: 7, timeLimit: 60 },
     { cupCount: 10, slotCount: 8, timeLimit: 60 } 
 ];
 
@@ -50,7 +50,7 @@ function startLevel() {
     document.getElementById('time-left').innerText = levelData.timeLimit;
 
     shuffledCups = generateCups(levelData.cupCount);
-    correctOrder = generateCorrectOrder(levelData.cupCount, levelData.slotCount);
+    correctOrder = generateCorrectOrder(shuffledCups, levelData.slotCount);
 
     displayCupsInStack(shuffledCups);
     createCupSlots(levelData.slotCount, levelData.stacked);
@@ -61,15 +61,18 @@ function startLevel() {
 function generateCups(count) {
     const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown', 'beige', 'teal'];
     const selectedColors = colors.slice(0, count);
-    return selectedColors.sort(() => Math.random() - 0.5);
+    return selectedColors.sort(() => Math.random() - 0.5); // Randomize cup colors
 }
 
-function generateCorrectOrder(cupCount, slotCount) {
-    // Randomly assign cups to slots; some slots may have multiple cups if stacking is enabled
+function generateCorrectOrder(cups, slotCount) {
+    // Distribute cups randomly across slots, allowing for stacking in some levels
     const correctOrder = Array(slotCount).fill().map(() => []);
-    shuffledCups.forEach((cup, index) => {
-        correctOrder[index % slotCount].push(cup);
+
+    cups.forEach((cup) => {
+        const randomSlot = Math.floor(Math.random() * slotCount);
+        correctOrder[randomSlot].push(cup);
     });
+
     return correctOrder;
 }
 
@@ -225,7 +228,7 @@ function checkArrangement() {
             endGame();
         }
     } else {
-        showModal(`${correctCount} out of ${correctOrder.length} slots are correct. Try again!`);
+        showModal(`${correctCount} out of ${correctOrder.length} slots are correctly filled. Try again!`);
     }
 }
 
@@ -282,3 +285,4 @@ function showModal(message) {
 
     modal.style.display = 'block';
 }
+
