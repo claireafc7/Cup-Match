@@ -1,16 +1,10 @@
 const levels = [
-    { cupCount: 3, timeLimit: 60 },
-    { cupCount: 3, timeLimit: 45 },
-    { cupCount: 3, timeLimit: 30 },
-    { cupCount: 4, timeLimit: 60 },
-    { cupCount: 4, timeLimit: 45 },
-    { cupCount: 5, timeLimit: 60 },
-    { cupCount: 5, timeLimit: 45 },
-    { cupCount: 6, timeLimit: 60 },
-    { cupCount: 7, timeLimit: 60 },
-    { cupCount: 8, timeLimit: 60 },
-    { cupCount: 9, timeLimit: 60 },
-    { cupCount: 10, timeLimit: 60 }
+    { cupCount: 3, timeLimit: 60, duplicateColors: 0 }, // Level 1: Normal
+    { cupCount: 4, timeLimit: 60, duplicateColors: 1 }, // Level 2: One duplicate color
+    { cupCount: 5, timeLimit: 60, duplicateColors: 1 }, // Level 3: One duplicate color
+    { cupCount: 6, timeLimit: 60, duplicateColors: 2 }, // Level 4: Two duplicate colors
+    { cupCount: 8, timeLimit: 60, duplicateColors: 3 }, // Level 5: Three duplicate colors
+    { cupCount: 8, timeLimit: 60, allSameColor: true }, // Level 6: All cups the same color
 ];
 
 let currentLevel = 0;
@@ -48,19 +42,36 @@ function startLevel() {
     document.getElementById('level').innerText = `Level ${currentLevel + 1}`;
     document.getElementById('time-left').innerText = levelData.timeLimit;
 
-    shuffledCups = generateCups(levelData.cupCount);
+    shuffledCups = generateCups(levelData.cupCount, levelData.duplicateColors, levelData.allSameColor);
     correctOrder = [...shuffledCups].sort(() => Math.random() - 0.5);
 
     displayCupsInStack(shuffledCups);
     createCupSlots(levelData.cupCount);
-
     startTimer(levelData.timeLimit);
 }
 
-function generateCups(count) {
+function generateCups(count, duplicateColors = 0, allSameColor = false) {
     const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown', 'beige', 'teal'];
-    const selectedColors = colors.slice(0, count);
-    return selectedColors.sort(() => Math.random() - 0.5);
+
+    let selectedColors = [];
+
+    if (allSameColor) {
+        // All cups the same color
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        selectedColors = Array(count).fill(color);
+    } else {
+        // Pick random colors
+        selectedColors = colors.slice(0, count - duplicateColors);
+        // Add duplicate colors
+        for (let i = 0; i < duplicateColors; i++) {
+            const duplicateColor = selectedColors[Math.floor(Math.random() * selectedColors.length)];
+            selectedColors.push(duplicateColor);
+        }
+
+        selectedColors = selectedColors.sort(() => Math.random() - 0.5); // Shuffle colors
+    }
+
+    return selectedColors;
 }
 
 function displayCupsInStack(cups) {
@@ -103,7 +114,6 @@ function createCupElement(color) {
     return cupElement;
 }
 
-// Drag and Drop Functions for Desktop
 function dragStart(event) {
     selectedCupElement = event.target;
     event.dataTransfer.setData('text/plain', event.target.style.backgroundColor);
@@ -130,7 +140,6 @@ function drop(event) {
     }
 }
 
-// Touch Functions for Mobile
 function touchStart(event) {
     selectedCupElement = event.target;
 }
@@ -181,7 +190,7 @@ function checkArrangement() {
 
     if (correctCount === correctOrder.length) {
         clearInterval(timerInterval);
-        
+
         // Check if it's the last level
         if (currentLevel + 1 < levels.length) {
             showModal('Correct! Moving to the next level.');
@@ -238,17 +247,14 @@ function showModal(message) {
     modalClose.innerText = 'Close';
     modalClose.className = 'modal-close';
     modalClose.addEventListener('click', () => {
-        modal.style.display = 'none';
-        modal.remove();
+        document.body.removeChild(modal);
     });
 
     modalContent.appendChild(modalText);
     modalContent.appendChild(modalClose);
     modal.appendChild(modalContent);
+
     document.body.appendChild(modal);
-
-    modal.style.display = 'block';
 }
-
 
 
