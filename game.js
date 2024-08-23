@@ -43,7 +43,7 @@ function startLevel() {
     document.getElementById('time-left').innerText = levelData.timeLimit;
 
     shuffledCups = generateCups(levelData.cupCount, levelData.duplicateColors, levelData.allSameColor);
-    correctOrder = [...shuffledCups].sort(() => Math.random() - 0.5);
+    correctOrder = [...shuffledCups];
 
     displayCupsInStack(shuffledCups);
     createCupSlots(levelData.cupCount);
@@ -175,10 +175,16 @@ function returnCupToStack(event) {
 }
 
 function checkArrangement() {
-    const arrangedCups = [...document.getElementById('arrangement-container').children].map(slot => {
+    const arrangementContainer = document.getElementById('arrangement-container');
+    const arrangedCups = [...arrangementContainer.children].map(slot => {
         const cup = slot.querySelector('.cup');
         return cup ? cup.style.backgroundColor : null;
     });
+
+    if (arrangedCups.includes(null)) {
+        showModal('Make sure every slot has a cup.');
+        return;
+    }
 
     let correctCount = 0;
 
@@ -256,5 +262,6 @@ function showModal(message) {
 
     document.body.appendChild(modal);
 }
+
 
 
