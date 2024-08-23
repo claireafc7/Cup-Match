@@ -1,23 +1,15 @@
 const levels = [
     { cupCount: 3, timeLimit: 60 },
-    { cupCount: 3, timeLimit: 45 },
-    { cupCount: 3, timeLimit: 30 },
-    { cupCount: 4, timeLimit: 60 },
-    { cupCount: 4, timeLimit: 45 },
-    { cupCount: 5, timeLimit: 60 },
-    { cupCount: 5, timeLimit: 45 },
-    { cupCount: 6, timeLimit: 60 },
-    { cupCount: 7, timeLimit: 60 },
-    { cupCount: 8, timeLimit: 60 },
-    { cupCount: 9, timeLimit: 60 },
-    { cupCount: 10, timeLimit: 60 }
-
+    { cupCount: 8, timeLimit: 60, patternLevel: true } // Pattern-based level with 3 chances
 ];
 
 let currentLevel = 0;
 let timerInterval;
 let shuffledCups = [];
 let correctOrder = [];
+let displayedPattern = [];
+let attemptsLeft = 3;
+let showingPattern = false;
 let selectedCupElement = null;
 let draggedOverElement = null;
 
@@ -52,9 +44,14 @@ function startLevel() {
     shuffledCups = generateCups(levelData.cupCount);
     correctOrder = [...shuffledCups].sort(() => Math.random() - 0.5);
 
-    displayCupsInStack(shuffledCups);
-    createCupSlots(levelData.cupCount);
+    if (levelData.patternLevel) {
+        displayedPattern = [...correctOrder];
+        showPattern();
+    } else {
+        displayCupsInStack(shuffledCups);
+    }
 
+    createCupSlots(levelData.cupCount);
     startTimer(levelData.timeLimit);
 }
 
@@ -104,7 +101,25 @@ function createCupElement(color) {
     return cupElement;
 }
 
-// Drag and Drop Functions for Desktop
+function showPattern() {
+    const stackContainer = document.getElementById('stack-container');
+    stackContainer.innerHTML = '';
+
+    displayedPattern.forEach(color => {
+        const cupElement = createCupElement(color);
+        stackContainer.appendChild(cupElement);
+    });
+
+    // Show the pattern for 5 seconds, then hide it
+    setTimeout(() => {
+        stackContainer.innerHTML = '';
+        startTimer(levels[currentLevel].timeLimit); // Reset timer for actual play
+        showingPattern = false;
+    }, 5000);
+
+    showingPattern = true;
+}
+
 function dragStart(event) {
     selectedCupElement = event.target;
     event.dataTransfer.setData('text/plain', event.target.style.backgroundColor);
@@ -131,7 +146,6 @@ function drop(event) {
     }
 }
 
-// Touch Functions for Mobile
 function touchStart(event) {
     selectedCupElement = event.target;
 }
@@ -182,7 +196,7 @@ function checkArrangement() {
 
     if (correctCount === correctOrder.length) {
         clearInterval(timerInterval);
-        
+
         // Check if it's the last level
         if (currentLevel + 1 < levels.length) {
             showModal('Correct! Moving to the next level.');
@@ -193,7 +207,17 @@ function checkArrangement() {
             endGame();
         }
     } else {
-        showModal(`${correctCount} out of ${correctOrder.length} cups are in the correct position. Try again!`);
+        if (levels[currentLevel].patternLevel) {
+            attemptsLeft--;
+            if (attemptsLeft > 0) {
+                showModal(`Incorrect arrangement. You have ${attemptsLeft} ${attemptsLeft === 1 ? 'chance' : 'chances'} left.`);
+            } else {
+                showModal('No chances left. Game over.');
+                endGame();
+            }
+        } else {
+            showModal(`${correctCount} out of ${correctOrder.length} cups are in the correct position. Try again!`);
+        }
     }
 }
 
