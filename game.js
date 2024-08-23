@@ -13,11 +13,11 @@ const levels = [
     { cupCount: 10, timeLimit: 60 },
 
     // Levels with duplicate colors starting from level 13
-    { cupCount: 11, timeLimit: 60, duplicateColors: 2 },  // 2 duplicate colors
-    { cupCount: 12, timeLimit: 60, duplicateColors: 3 },  // 3 duplicate colors
-    { cupCount: 13, timeLimit: 60, duplicateColors: 4 },  // 4 duplicate colors
-    { cupCount: 14, timeLimit: 60, duplicateColors: 5 },  // 5 duplicate colors
-    { cupCount: 15, timeLimit: 60, duplicateColors: 6 },  // 6 duplicate colors
+    { cupCount: 10, timeLimit: 75, duplicateColors: 2 },  // 2 duplicate colors
+    { cupCount: 10, timeLimit: 60, duplicateColors: 2 },  // 3 duplicate colors
+    { cupCount: 12, timeLimit: 75, duplicateColors: 4 },  // 4 duplicate colors
+    { cupCount: 12, timeLimit: 60, duplicateColors: 4 },  // 5 duplicate colors
+    { cupCount: 12, timeLimit: 60, duplicateColors: 6 },  // 6 duplicate colors
 ];
 
 let currentLevel = 0;
