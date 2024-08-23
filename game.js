@@ -1,17 +1,17 @@
 const levels = [
-    { cupCount: 3, slotCount: 3, timeLimit: 60 },
-    { cupCount: 3, slotCount: 3, timeLimit: 45 },
-    { cupCount: 3, slotCount: 3, timeLimit: 30 },
-    { cupCount: 4, slotCount: 4, timeLimit: 60 },
-    { cupCount: 4, slotCount: 4, timeLimit: 45 },
-    { cupCount: 5, slotCount: 5, timeLimit: 60 },
-    { cupCount: 5, slotCount: 5, timeLimit: 45 },
-    { cupCount: 6, slotCount: 6, timeLimit: 60 },
-    { cupCount: 7, slotCount: 7, timeLimit: 60 },
-    { cupCount: 8, slotCount: 6, timeLimit: 60, stacked: true }, // Stacking level
-    { cupCount: 8, slotCount: 6, timeLimit: 60, stacked: true }, // Stacking level
-    { cupCount: 9, slotCount: 7, timeLimit: 60 },
-    { cupCount: 10, slotCount: 8, timeLimit: 60 }
+    { cupCount: 3, timeLimit: 60 },
+    { cupCount: 3, timeLimit: 45 },
+    { cupCount: 3, timeLimit: 30 },
+    { cupCount: 4, timeLimit: 60 },
+    { cupCount: 4, timeLimit: 45 },
+    { cupCount: 5, timeLimit: 60 },
+    { cupCount: 5, timeLimit: 45 },
+    { cupCount: 6, timeLimit: 60 },
+    { cupCount: 7, timeLimit: 60 },
+    { cupCount: 8, timeLimit: 60 },
+    { cupCount: 9, timeLimit: 60 },
+    { cupCount: 10, timeLimit: 60 }
+    }
 ];
 
 let currentLevel = 0;
@@ -50,10 +50,10 @@ function startLevel() {
     document.getElementById('time-left').innerText = levelData.timeLimit;
 
     shuffledCups = generateCups(levelData.cupCount);
-    correctOrder = generateCorrectOrder(shuffledCups, levelData.slotCount, levelData.stacked);
+    correctOrder = [...shuffledCups].sort(() => Math.random() - 0.5);
 
     displayCupsInStack(shuffledCups);
-    createCupSlots(levelData.slotCount);
+    createCupSlots(levelData.cupCount);
 
     startTimer(levelData.timeLimit);
 }
@@ -62,22 +62,6 @@ function generateCups(count) {
     const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown', 'beige', 'teal'];
     const selectedColors = colors.slice(0, count);
     return selectedColors.sort(() => Math.random() - 0.5);
-}
-
-function generateCorrectOrder(cups, slotCount, stacked) {
-    let order = [...cups].sort(() => Math.random() - 0.5);
-
-    if (stacked) {
-        // Group cups into stacks for stacked levels
-        const stacks = [];
-        while (order.length > 0) {
-            stacks.push(order.splice(0, 2));
-        }
-        return stacks;
-    } else {
-        // Just group each cup individually for regular levels
-        return order.map(cup => [cup]);
-    }
 }
 
 function displayCupsInStack(cups) {
@@ -133,28 +117,16 @@ function dragOver(event) {
 function drop(event) {
     event.preventDefault();
     const targetSlot = event.target;
-    const levelData = levels[currentLevel];
-    const stackingAllowed = levelData.stacked;
 
     if (targetSlot.classList.contains('cup-slot') && selectedCupElement) {
         const targetCup = targetSlot.querySelector('.cup');
 
-        if (stackingAllowed) {
-            // Allow stacking up to two cups per slot
-            if (targetSlot.childElementCount < 2) {
-                targetSlot.appendChild(selectedCupElement);
-            }
-        } else {
-            // No stacking allowed, so only allow one cup per slot
-            if (!targetCup) {
-                targetSlot.appendChild(selectedCupElement);
-            } else {
-                // Swap cups between slots
-                selectedCupElement.parentElement.appendChild(targetCup);
-                targetSlot.appendChild(selectedCupElement);
-            }
+        if (targetCup) {
+            // Swap cups between slots
+            selectedCupElement.parentElement.appendChild(targetCup);
         }
 
+        targetSlot.appendChild(selectedCupElement);
         selectedCupElement = null;
     }
 }
@@ -175,28 +147,15 @@ function touchMove(event) {
 }
 
 function touchEnd() {
-    const levelData = levels[currentLevel];
-    const stackingAllowed = levelData.stacked;
-
     if (draggedOverElement && draggedOverElement.classList.contains('cup-slot') && selectedCupElement) {
         const targetCup = draggedOverElement.querySelector('.cup');
 
-        if (stackingAllowed) {
-            // Allow stacking for touch if stacking is allowed in the level
-            if (draggedOverElement.childElementCount < 2) {
-                draggedOverElement.appendChild(selectedCupElement);
-            }
-        } else {
-            // No stacking allowed for touch
-            if (!targetCup) {
-                draggedOverElement.appendChild(selectedCupElement);
-            } else {
-                // Swap cups for touch
-                selectedCupElement.parentElement.appendChild(targetCup);
-                draggedOverElement.appendChild(selectedCupElement);
-            }
+        if (targetCup) {
+            // Swap cups between slots for touch
+            selectedCupElement.parentElement.appendChild(targetCup);
         }
 
+        draggedOverElement.appendChild(selectedCupElement);
         selectedCupElement = null;
         draggedOverElement = null;
     }
@@ -208,28 +167,16 @@ function returnCupToStack(event) {
 }
 
 function checkArrangement() {
-    const levelData = levels[currentLevel];
-    const stackingAllowed = levelData.stacked;
-
     const arrangedCups = [...document.getElementById('arrangement-container').children].map(slot => {
-        const cupsInSlot = [...slot.querySelectorAll('.cup')];
-        return cupsInSlot.map(cup => cup.style.backgroundColor);
+        const cup = slot.querySelector('.cup');
+        return cup ? cup.style.backgroundColor : null;
     });
 
     let correctCount = 0;
 
-    arrangedCups.forEach((slotCups, index) => {
-        const correctSlotCups = correctOrder[index];
-
-        if (slotCups.length === correctSlotCups.length) {
-            let isCorrect = true;
-            for (let i = 0; i < slotCups.length; i++) {
-                if (slotCups[i] !== correctSlotCups[i]) {
-                    isCorrect = false;
-                    break;
-                }
-            }
-            if (isCorrect) correctCount++;
+    arrangedCups.forEach((color, index) => {
+        if (color === correctOrder[index]) {
+            correctCount++;
         }
     });
 
@@ -246,7 +193,7 @@ function checkArrangement() {
             endGame();
         }
     } else {
-        showModal(`${correctCount} out of ${correctOrder.length} slots are correct. Try again!`);
+        showModal(`${correctCount} out of ${correctOrder.length} cups are in the correct position. Try again!`);
     }
 }
 
@@ -303,7 +250,6 @@ function showModal(message) {
 
     modal.style.display = 'block';
 }
-
 
 
 
