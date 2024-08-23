@@ -10,7 +10,14 @@ const levels = [
     { cupCount: 7, timeLimit: 60 },
     { cupCount: 8, timeLimit: 60 },
     { cupCount: 9, timeLimit: 60 },
-    { cupCount: 10, timeLimit: 60 }
+    { cupCount: 10, timeLimit: 60 },
+
+    // Levels with duplicate colors starting from level 13
+    { cupCount: 11, timeLimit: 60, duplicateColors: 2 },  // 2 duplicate colors
+    { cupCount: 12, timeLimit: 60, duplicateColors: 3 },  // 3 duplicate colors
+    { cupCount: 13, timeLimit: 60, duplicateColors: 4 },  // 4 duplicate colors
+    { cupCount: 14, timeLimit: 60, duplicateColors: 5 },  // 5 duplicate colors
+    { cupCount: 15, timeLimit: 60, duplicateColors: 6 },  // 6 duplicate colors
 ];
 
 let currentLevel = 0;
@@ -48,8 +55,8 @@ function startLevel() {
     document.getElementById('level').innerText = `Level ${currentLevel + 1}`;
     document.getElementById('time-left').innerText = levelData.timeLimit;
 
-    // Determine the number of duplicate colors for this level (starting from level 13)
-    const duplicateColors = currentLevel >= 12 ? Math.floor((levelData.cupCount - 1) / 2) : 0;
+    // Use duplicateColors from the level data if present, otherwise default to 0
+    const duplicateColors = levelData.duplicateColors || 0;
 
     shuffledCups = generateCups(levelData.cupCount, duplicateColors);
     correctOrder = [...shuffledCups].sort(() => Math.random() - 0.5);
@@ -64,12 +71,11 @@ function generateCups(count, duplicateColors = 0) {
     const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown', 'beige', 'teal'];
     let selectedColors = colors.slice(0, count - duplicateColors);
 
-    // Add duplicate colors if applicable
+    // Add duplicate colors
     for (let i = 0; i < duplicateColors; i++) {
         selectedColors.push(selectedColors[Math.floor(Math.random() * selectedColors.length)]);
     }
 
-    console.log("Generated cups:", selectedColors); // Debug log
     return selectedColors.sort(() => Math.random() - 0.5);
 }
 
