@@ -50,7 +50,7 @@ function startLevel() {
     document.getElementById('time-left').innerText = levelData.timeLimit;
 
     shuffledCups = generateCups(levelData.cupCount);
-    correctOrder = [...shuffledCups].sort(() => Math.random() - 0.5);
+    correctOrder = generateCorrectOrder(shuffledCups, levelData.slotCount, levelData.stacked);
 
     displayCupsInStack(shuffledCups);
     createCupSlots(levelData.slotCount);
@@ -62,6 +62,22 @@ function generateCups(count) {
     const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown', 'beige', 'teal'];
     const selectedColors = colors.slice(0, count);
     return selectedColors.sort(() => Math.random() - 0.5);
+}
+
+function generateCorrectOrder(cups, slotCount, stacked) {
+    let order = [...cups].sort(() => Math.random() - 0.5);
+
+    if (stacked) {
+        // Group cups into stacks for stacked levels
+        const stacks = [];
+        while (order.length > 0) {
+            stacks.push(order.splice(0, 2));
+        }
+        return stacks;
+    } else {
+        // Just group each cup individually for regular levels
+        return order.map(cup => [cup]);
+    }
 }
 
 function displayCupsInStack(cups) {
@@ -192,6 +208,9 @@ function returnCupToStack(event) {
 }
 
 function checkArrangement() {
+    const levelData = levels[currentLevel];
+    const stackingAllowed = levelData.stacked;
+
     const arrangedCups = [...document.getElementById('arrangement-container').children].map(slot => {
         const cupsInSlot = [...slot.querySelectorAll('.cup')];
         return cupsInSlot.map(cup => cup.style.backgroundColor);
@@ -199,9 +218,18 @@ function checkArrangement() {
 
     let correctCount = 0;
 
-    arrangedCups.forEach((colors, index) => {
-        if (colors.length === correctOrder[index].length && colors.every((color, i) => color === correctOrder[index][i])) {
-            correctCount++;
+    arrangedCups.forEach((slotCups, index) => {
+        const correctSlotCups = correctOrder[index];
+
+        if (slotCups.length === correctSlotCups.length) {
+            let isCorrect = true;
+            for (let i = 0; i < slotCups.length; i++) {
+                if (slotCups[i] !== correctSlotCups[i]) {
+                    isCorrect = false;
+                    break;
+                }
+            }
+            if (isCorrect) correctCount++;
         }
     });
 
@@ -218,7 +246,7 @@ function checkArrangement() {
             endGame();
         }
     } else {
-        showModal(`${correctCount} out of ${correctOrder.length} slots are correctly filled. Try again!`);
+        showModal(`${correctCount} out of ${correctOrder.length} slots are correct. Try again!`);
     }
 }
 
@@ -275,5 +303,6 @@ function showModal(message) {
 
     modal.style.display = 'block';
 }
+
 
 
