@@ -11,7 +11,7 @@ const levels = [
     { cupCount: 8, timeLimit: 60 },
     { cupCount: 9, timeLimit: 60 },
     { cupCount: 10, timeLimit: 60 }
-    }
+
 ];
 
 let currentLevel = 0;
