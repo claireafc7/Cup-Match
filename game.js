@@ -8,10 +8,10 @@ const levels = [
     { cupCount: 5, slotCount: 5, timeLimit: 45 },
     { cupCount: 6, slotCount: 6, timeLimit: 60 },
     { cupCount: 7, slotCount: 7, timeLimit: 60 },
-    { cupCount: 8, slotCount: 6, timeLimit: 60 }, // 8 cups, 6 slots (requires stacking)
-    { cupCount: 8, slotCount: 6, timeLimit: 60, stacked: true }, // 8 cups, 6 slots, stacking enabled
+    { cupCount: 8, slotCount: 6, timeLimit: 60, stacked: true }, // Stacking level
+    { cupCount: 8, slotCount: 6, timeLimit: 60, stacked: true }, // Stacking level
     { cupCount: 9, slotCount: 7, timeLimit: 60 },
-    { cupCount: 10, slotCount: 8, timeLimit: 60 } 
+    { cupCount: 10, slotCount: 8, timeLimit: 60 }
 ];
 
 let currentLevel = 0;
@@ -50,10 +50,10 @@ function startLevel() {
     document.getElementById('time-left').innerText = levelData.timeLimit;
 
     shuffledCups = generateCups(levelData.cupCount);
-    correctOrder = generateCorrectOrder(shuffledCups, levelData.slotCount);
+    correctOrder = [...shuffledCups].sort(() => Math.random() - 0.5);
 
     displayCupsInStack(shuffledCups);
-    createCupSlots(levelData.slotCount, levelData.stacked);
+    createCupSlots(levelData.slotCount);
 
     startTimer(levelData.timeLimit);
 }
@@ -61,19 +61,7 @@ function startLevel() {
 function generateCups(count) {
     const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown', 'beige', 'teal'];
     const selectedColors = colors.slice(0, count);
-    return selectedColors.sort(() => Math.random() - 0.5); // Randomize cup colors
-}
-
-function generateCorrectOrder(cups, slotCount) {
-    // Distribute cups randomly across slots, allowing for stacking in some levels
-    const correctOrder = Array(slotCount).fill().map(() => []);
-
-    cups.forEach((cup) => {
-        const randomSlot = Math.floor(Math.random() * slotCount);
-        correctOrder[randomSlot].push(cup);
-    });
-
-    return correctOrder;
+    return selectedColors.sort(() => Math.random() - 0.5);
 }
 
 function displayCupsInStack(cups) {
@@ -86,7 +74,7 @@ function displayCupsInStack(cups) {
     });
 }
 
-function createCupSlots(count, stackingAllowed = false) {
+function createCupSlots(count) {
     const arrangementContainer = document.getElementById('arrangement-container');
     arrangementContainer.innerHTML = '';
 
@@ -95,7 +83,7 @@ function createCupSlots(count, stackingAllowed = false) {
         slotElement.className = 'cup-slot';
         slotElement.setAttribute('data-index', i);
         slotElement.addEventListener('dragover', dragOver);
-        slotElement.addEventListener('drop', (event) => drop(event, stackingAllowed));
+        slotElement.addEventListener('drop', drop);
         arrangementContainer.appendChild(slotElement);
     }
 }
@@ -126,9 +114,11 @@ function dragOver(event) {
     event.preventDefault();
 }
 
-function drop(event, stackingAllowed) {
+function drop(event) {
     event.preventDefault();
     const targetSlot = event.target;
+    const levelData = levels[currentLevel];
+    const stackingAllowed = levelData.stacked;
 
     if (targetSlot.classList.contains('cup-slot') && selectedCupElement) {
         const targetCup = targetSlot.querySelector('.cup');
@@ -285,4 +275,5 @@ function showModal(message) {
 
     modal.style.display = 'block';
 }
+
 
