@@ -1,3 +1,4 @@
+// Game Configuration and State Variables
 const levels = [
     { cupCount: 3, timeLimit: 60 },
     { cupCount: 3, timeLimit: 45 },
@@ -7,11 +8,15 @@ const levels = [
     { cupCount: 5, timeLimit: 60 },
     { cupCount: 5, timeLimit: 45 },
     { cupCount: 6, timeLimit: 60 },
-    { cupCount: 6, timeLimit: 45 },
-    { cupCount: 6, timeLimit: 30 },
     { cupCount: 7, timeLimit: 60 },
-    { cupCount: 7, timeLimit: 45 },
-    { cupCount: 8, timeLimit: 60 }
+    { cupCount: 8, timeLimit: 60 },
+    { cupCount: 9, timeLimit: 60 },
+    { cupCount: 10, timeLimit: 60 },
+    { cupCount: 10, timeLimit: 75, duplicateColors: 2 },  // Levels with duplicate colors
+    { cupCount: 10, timeLimit: 60, duplicateColors: 2 },
+    { cupCount: 12, timeLimit: 75, duplicateColors: 4 },
+    { cupCount: 12, timeLimit: 60, duplicateColors: 4 },
+    { cupCount: 12, timeLimit: 60, duplicateColors: 6 }
 ];
 
 let currentLevel = 0;
@@ -22,51 +27,65 @@ let selectedCupElement = null;
 let draggedOverElement = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    const startGameButton = document.getElementById('start-game');
-    startGameButton.addEventListener('click', startGame);
-
-    const endGameButton = document.getElementById('end-game');
-    endGameButton.addEventListener('click', endGame);
-
-    const checkArrangementButton = document.getElementById('check-arrangement');
-    checkArrangementButton.addEventListener('click', checkArrangement);
-
-    // Prevent page refresh
-    window.addEventListener('beforeunload', (event) => {
-        event.preventDefault();
-        event.returnValue = ''; // This triggers the confirmation dialog in most browsers
-    });
+    setupEventListeners();
+    preventPageRefresh();
 });
 
+function setupEventListeners() {
+    document.getElementById('start-game').addEventListener('click', startGame);
+    document.getElementById('end-game').addEventListener('click', endGame);
+    document.getElementById('check-arrangement').addEventListener('click', checkArrangement);
+}
+
+function preventPageRefresh() {
+    window.addEventListener('beforeunload', (event) => {
+        event.preventDefault();
+        event.returnValue = ''; // Triggers confirmation dialog on refresh
+    });
+}
+
 function startGame() {
-    document.getElementById('home-page').style.display = 'none';
-    document.getElementById('game-page').style.display = 'block';
+    switchToPage('game-page');
     startLevel();
 }
 
 function startLevel() {
     const levelData = levels[currentLevel];
-    document.getElementById('level').innerText = `Level ${currentLevel + 1}`;
-    document.getElementById('time-left').innerText = levelData.timeLimit;
-
-    shuffledCups = generateCups(levelData.cupCount);
+    updateLevelInfo(levelData);
+    
+    shuffledCups = generateCups(levelData.cupCount, levelData.duplicateColors || 0);
     correctOrder = [...shuffledCups].sort(() => Math.random() - 0.5);
-
+    
     displayCupsInStack(shuffledCups);
     createCupSlots(levelData.cupCount);
-
+    
     startTimer(levelData.timeLimit);
 }
 
-function generateCups(count) {
-    const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown'];
-    const selectedColors = colors.slice(0, count);
-    return selectedColors.sort(() => Math.random() - 0.5);
+function updateLevelInfo(levelData) {
+    document.getElementById('level').innerText = `Level ${currentLevel + 1}`;
+    document.getElementById('time-left').innerText = levelData.timeLimit;
+}
+
+function generateCups(count, duplicateColors = 0) {
+    const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown', 'beige', 'teal'];
+    let selectedColors = colors.slice(0, count - duplicateColors);
+
+    // Add duplicate colors
+    for (let i = 0; i < duplicateColors; i++) {
+        selectedColors.push(selectedColors[Math.floor(Math.random() * selectedColors.length)]);
+    }
+
+    return shuffleArray(selectedColors);
+}
+
+function shuffleArray(array) {
+    return array.sort(() => Math.random() - 0.5);
 }
 
 function displayCupsInStack(cups) {
     const stackContainer = document.getElementById('stack-container');
-    stackContainer.innerHTML = '';
+    stackContainer.innerHTML = ''; // Clear previous cups
 
     cups.forEach(color => {
         const cupElement = createCupElement(color);
@@ -76,16 +95,21 @@ function displayCupsInStack(cups) {
 
 function createCupSlots(count) {
     const arrangementContainer = document.getElementById('arrangement-container');
-    arrangementContainer.innerHTML = '';
+    arrangementContainer.innerHTML = ''; // Clear previous slots
 
     for (let i = 0; i < count; i++) {
-        const slotElement = document.createElement('div');
-        slotElement.className = 'cup-slot';
-        slotElement.setAttribute('data-index', i);
-        slotElement.addEventListener('dragover', dragOver);
-        slotElement.addEventListener('drop', drop);
+        const slotElement = createCupSlotElement(i);
         arrangementContainer.appendChild(slotElement);
     }
+}
+
+function createCupSlotElement(index) {
+    const slotElement = document.createElement('div');
+    slotElement.className = 'cup-slot';
+    slotElement.setAttribute('data-index', index);
+    slotElement.addEventListener('dragover', dragOver);
+    slotElement.addEventListener('drop', drop);
+    return slotElement;
 }
 
 function createCupElement(color) {
@@ -93,15 +117,19 @@ function createCupElement(color) {
     cupElement.className = 'cup';
     cupElement.style.backgroundColor = color;
     cupElement.setAttribute('draggable', true);
+
+    // Event listeners for drag and touch actions
     cupElement.addEventListener('dragstart', dragStart);
     cupElement.addEventListener('click', returnCupToStack);
+    addTouchEvents(cupElement);
 
-    // Touch support for mobile
+    return cupElement;
+}
+
+function addTouchEvents(cupElement) {
     cupElement.addEventListener('touchstart', touchStart);
     cupElement.addEventListener('touchmove', touchMove);
     cupElement.addEventListener('touchend', touchEnd);
-
-    return cupElement;
 }
 
 // Drag and Drop Functions for Desktop
@@ -111,7 +139,7 @@ function dragStart(event) {
 }
 
 function dragOver(event) {
-    event.preventDefault();
+    event.preventDefault(); // Necessary to allow drop
 }
 
 function drop(event) {
@@ -119,16 +147,19 @@ function drop(event) {
     const targetSlot = event.target;
 
     if (targetSlot.classList.contains('cup-slot') && selectedCupElement) {
-        const targetCup = targetSlot.querySelector('.cup');
-
-        if (targetCup) {
-            // Swap cups between slots
-            selectedCupElement.parentElement.appendChild(targetCup);
-        }
-
-        targetSlot.appendChild(selectedCupElement);
-        selectedCupElement = null;
+        swapCups(targetSlot);
     }
+}
+
+function swapCups(targetSlot) {
+    const targetCup = targetSlot.querySelector('.cup');
+
+    if (targetCup) {
+        selectedCupElement.parentElement.appendChild(targetCup); // Swap cups
+    }
+
+    targetSlot.appendChild(selectedCupElement);
+    selectedCupElement = null;
 }
 
 // Touch Functions for Mobile
@@ -139,61 +170,59 @@ function touchStart(event) {
 function touchMove(event) {
     event.preventDefault();
     const touch = event.touches[0];
-    const elementAtTouch = document.elementFromPoint(touch.clientX, touch.clientY);
-
-    if (elementAtTouch && elementAtTouch.classList.contains('cup-slot')) {
-        draggedOverElement = elementAtTouch;
-    }
+    draggedOverElement = document.elementFromPoint(touch.clientX, touch.clientY);
 }
 
 function touchEnd() {
     if (draggedOverElement && draggedOverElement.classList.contains('cup-slot') && selectedCupElement) {
-        const targetCup = draggedOverElement.querySelector('.cup');
-
-        if (targetCup) {
-            // Swap cups between slots for touch
-            selectedCupElement.parentElement.appendChild(targetCup);
-        }
-
-        draggedOverElement.appendChild(selectedCupElement);
-        selectedCupElement = null;
-        draggedOverElement = null;
+        swapCups(draggedOverElement); // Swap cups using touch
     }
+    resetTouchVariables();
+}
+
+function resetTouchVariables() {
+    selectedCupElement = null;
+    draggedOverElement = null;
 }
 
 function returnCupToStack(event) {
-    const stackContainer = document.getElementById('stack-container');
-    stackContainer.appendChild(event.target);
+    document.getElementById('stack-container').appendChild(event.target); // Return cup to stack
 }
 
 function checkArrangement() {
-    const arrangedCups = [...document.getElementById('arrangement-container').children].map(slot => {
+    const arrangedCups = getArrangedCups();
+    const correctCount = calculateCorrectCups(arrangedCups);
+
+    if (correctCount === correctOrder.length) {
+        handleLevelCompletion();
+    } else {
+        showModal(`${correctCount} out of ${correctOrder.length} cups are correct. Try again!`);
+    }
+}
+
+function getArrangedCups() {
+    return [...document.getElementById('arrangement-container').children].map(slot => {
         const cup = slot.querySelector('.cup');
         return cup ? cup.style.backgroundColor : null;
     });
+}
 
-    let correctCount = 0;
+function calculateCorrectCups(arrangedCups) {
+    return arrangedCups.reduce((count, color, index) => {
+        return color === correctOrder[index] ? count + 1 : count;
+    }, 0);
+}
 
-    arrangedCups.forEach((color, index) => {
-        if (color === correctOrder[index]) {
-            correctCount++;
-        }
-    });
+function handleLevelCompletion() {
+    clearInterval(timerInterval);
 
-    if (correctCount === correctOrder.length) {
-        clearInterval(timerInterval);
-        
-        // Check if it's the last level
-        if (currentLevel + 1 < levels.length) {
-            showModal('Correct! Moving to the next level.');
-            currentLevel++;
-            startLevel();
-        } else {
-            showModal('Congratulations! You have completed all levels!');
-            endGame();
-        }
+    if (currentLevel + 1 < levels.length) {
+        showModal('Correct! Moving to the next level.');
+        currentLevel++;
+        startLevel();
     } else {
-        showModal(`${correctCount} out of ${correctOrder.length} cups are in the correct position. Try again!`);
+        showModal('Congratulations! You have completed all levels!');
+        endGame();
     }
 }
 
@@ -203,26 +232,39 @@ function startTimer(seconds) {
     timeLeftElement.innerText = timeLeft;
 
     timerInterval = setInterval(() => {
-        timeLeft--;
-        timeLeftElement.innerText = timeLeft;
+        updateTimeLeft(--timeLeft, timeLeftElement);
 
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
             showModal('Time\'s up! Game over.');
             endGame();
-        } else if (timeLeft <= 10) {
-            timeLeftElement.classList.add('warning');
-        } else {
-            timeLeftElement.classList.remove('warning');
         }
     }, 1000);
 }
 
+function updateTimeLeft(timeLeft, timeLeftElement) {
+    timeLeftElement.innerText = timeLeft;
+    if (timeLeft <= 10) {
+        timeLeftElement.classList.add('warning');
+    } else {
+        timeLeftElement.classList.remove('warning');
+    }
+}
+
 function endGame() {
     clearInterval(timerInterval);
-    document.getElementById('game-page').style.display = 'none';
-    document.getElementById('home-page').style.display = 'block';
+    switchToPage('home-page');
+    resetGame();
+}
+
+function resetGame() {
     currentLevel = 0;
+}
+
+function switchToPage(pageId) {
+    document.getElementById('home-page').style.display = 'none';
+    document.getElementById('game-page').style.display = 'none';
+    document.getElementById(pageId).style.display = 'block';
 }
 
 function showModal(message) {
@@ -238,10 +280,7 @@ function showModal(message) {
     const modalClose = document.createElement('button');
     modalClose.innerText = 'Close';
     modalClose.className = 'modal-close';
-    modalClose.addEventListener('click', () => {
-        modal.style.display = 'none';
-        modal.remove();
-    });
+    modalClose.addEventListener('click', () => closeModal(modal));
 
     modalContent.appendChild(modalText);
     modalContent.appendChild(modalClose);
@@ -250,3 +289,11 @@ function showModal(message) {
 
     modal.style.display = 'block';
 }
+
+function closeModal(modal) {
+    modal.style.display = 'none';
+    modal.remove();
+}
+
+
+
