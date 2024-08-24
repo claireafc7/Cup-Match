@@ -3,57 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Game</title>
-    <style>
-        /* Add your CSS here */
-    </style>
+    <title>Cup Match</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="home-page">
-        <h1>Welcome to the Game</h1>
+    <div id="home-page" class="page">
+        <h1>Cup Match</h1>
         <button id="start-game">Start Game</button>
-        <button id="instructions-button">How to Play</button> <!-- The new button -->
     </div>
-
-    <div id="game-page" style="display:none;">
-        <!-- Game content here -->
-    </div>
-
-    <!-- The hidden modal for instructions -->
-    <div id="instructions-modal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <h2>How to Play</h2>
-            <p>1. The goal of the game is to arrange the cups in the correct order.</p>
-            <p>2. Drag and drop the cups to rearrange them.</p>
-            <p>3. You have a limited amount of time to complete each level.</p>
-            <p>4. Starting from level 13, there will be duplicate cup colors to increase difficulty.</p>
-            <p>5. Check your arrangement by pressing the 'Check Arrangement' button.</p>
-            <p>6. If your arrangement is correct, you'll move on to the next level.</p>
-            <button id="close-instructions">Close</button>
+    <div id="game-page" class="page" style="display: none;">
+        <div id="level-info">
+            <span id="level">Level 1</span> <!-- Updated this to be more descriptive -->
+            <span id="time-left">60</span> seconds
         </div>
+        <div id="stack-container" class="cup-container"></div>
+        <div id="arrangement-container" class="cup-container"></div>
+        <button id="check-arrangement">Check Arrangement</button>
+        <button id="end-game">End Game</button>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const instructionsButton = document.getElementById('instructions-button');
-            const instructionsModal = document.getElementById('instructions-modal');
-            const closeInstructionsButton = document.getElementById('close-instructions');
-
-            instructionsButton.addEventListener('click', () => {
-                instructionsModal.style.display = 'block';
-            });
-
-            closeInstructionsButton.addEventListener('click', () => {
-                instructionsModal.style.display = 'none';
-            });
-
-            // Close the modal if the user clicks outside of it
-            window.addEventListener('click', (event) => {
-                if (event.target == instructionsModal) {
-                    instructionsModal.style.display = 'none';
-                }
-            });
-        });
-    </script>
+    <div id="modal" class="modal">
+        <h2>Modal Title</h2>
+        <p>Modal message goes here.</p>
+        <button id="modal-close">Close</button>
+    </div>
+    
+    <script src="game.js"></script>
 </body>
 </html>
