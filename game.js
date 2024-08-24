@@ -7,17 +7,11 @@ const levels = [
     { cupCount: 5, timeLimit: 60 },
     { cupCount: 5, timeLimit: 45 },
     { cupCount: 6, timeLimit: 60 },
+    { cupCount: 6, timeLimit: 45 },
+    { cupCount: 6, timeLimit: 30 },
     { cupCount: 7, timeLimit: 60 },
-    { cupCount: 8, timeLimit: 60 },
-    { cupCount: 9, timeLimit: 60 },
-    { cupCount: 10, timeLimit: 60 },
-
-    // Levels with duplicate colors starting from level 13
-    { cupCount: 10, timeLimit: 75, duplicateColors: 2 },  // 2 duplicate colors
-    { cupCount: 10, timeLimit: 60, duplicateColors: 2 },  // 3 duplicate colors
-    { cupCount: 12, timeLimit: 75, duplicateColors: 4 },  // 4 duplicate colors
-    { cupCount: 12, timeLimit: 60, duplicateColors: 4 },  // 5 duplicate colors
-    { cupCount: 12, timeLimit: 60, duplicateColors: 6 },  // 6 duplicate colors
+    { cupCount: 7, timeLimit: 45 },
+    { cupCount: 8, timeLimit: 60 }
 ];
 
 let currentLevel = 0;
@@ -55,10 +49,7 @@ function startLevel() {
     document.getElementById('level').innerText = `Level ${currentLevel + 1}`;
     document.getElementById('time-left').innerText = levelData.timeLimit;
 
-    // Use duplicateColors from the level data if present, otherwise default to 0
-    const duplicateColors = levelData.duplicateColors || 0;
-
-    shuffledCups = generateCups(levelData.cupCount, duplicateColors);
+    shuffledCups = generateCups(levelData.cupCount);
     correctOrder = [...shuffledCups].sort(() => Math.random() - 0.5);
 
     displayCupsInStack(shuffledCups);
@@ -67,15 +58,9 @@ function startLevel() {
     startTimer(levelData.timeLimit);
 }
 
-function generateCups(count, duplicateColors = 0) {
-    const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown', 'beige', 'teal'];
-    let selectedColors = colors.slice(0, count - duplicateColors);
-
-    // Add duplicate colors
-    for (let i = 0; i < duplicateColors; i++) {
-        selectedColors.push(selectedColors[Math.floor(Math.random() * selectedColors.length)]);
-    }
-
+function generateCups(count) {
+    const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown'];
+    const selectedColors = colors.slice(0, count);
     return selectedColors.sort(() => Math.random() - 0.5);
 }
 

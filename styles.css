@@ -1,4 +1,4 @@
-
+/* Global Styling */
 body {
     font-family: Arial, sans-serif;
     display: flex;
@@ -28,13 +28,13 @@ body {
 
 h1 {
     color: burlywood;
-    font-size: 200px;
+    font-size: 60px;
     margin-bottom: 20px;
 }
 
 button {
     padding: 12px 24px;
-    border: 2px solid black;
+    border: 4px solid black;
     border-radius: 12px;
     cursor: pointer;
     font-size: 1.1rem;
@@ -154,7 +154,7 @@ button:hover {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    background-color: whitesmoke;
+    background-color: white;
     padding: 20px;
     border: 2px solid black;
     border-radius: 10px;
