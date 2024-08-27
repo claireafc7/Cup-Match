@@ -12,11 +12,11 @@ const levels = [
     { cupCount: 8, timeLimit: 60 },
     { cupCount: 9, timeLimit: 60 },
     { cupCount: 10, timeLimit: 60 },
-    { cupCount: 10, timeLimit: 75, duplicateColors: 2 },
-    { cupCount: 10, timeLimit: 60, duplicateColors: 2 },
+    { cupCount: 10, timeLimit: 75, duplicateColors: 2 }, // Levels with duplicate colors
+    { cupCount: 10, timeLimit: 75, duplicateColors: 6 },
     { cupCount: 12, timeLimit: 75, duplicateColors: 4 },
-    { cupCount: 12, timeLimit: 60, duplicateColors: 4 },
-    { cupCount: 12, timeLimit: 60, duplicateColors: 6 }
+    { cupCount: 12, timeLimit: 75, duplicateColors: 8 },
+    { cupCount: 12, timeLimit: 75, duplicateColors: 12 }
 ];
 
 let currentLevel = 0;
@@ -35,25 +35,6 @@ function setupEventListeners() {
     document.getElementById('start-game').addEventListener('click', startGame);
     document.getElementById('end-game').addEventListener('click', endGame);
     document.getElementById('check-arrangement').addEventListener('click', checkArrangement);
-
-    // How to Play Modal Event Listeners
-    const howToPlayButton = document.getElementById('how-to-play-button');
-    const howToPlayModal = document.getElementById('how-to-play-modal');
-    const closeHowToPlayButton = document.getElementById('close-how-to-play');
-
-    howToPlayButton.addEventListener('click', () => {
-        howToPlayModal.style.display = 'block';
-    });
-
-    closeHowToPlayButton.addEventListener('click', () => {
-        howToPlayModal.style.display = 'none';
-    });
-
-    window.addEventListener('click', (event) => {
-        if (event.target == howToPlayModal) {
-            howToPlayModal.style.display = 'none';
-        }
-    });
 }
 
 function preventPageRefresh() {
@@ -71,13 +52,13 @@ function startGame() {
 function startLevel() {
     const levelData = levels[currentLevel];
     updateLevelInfo(levelData);
-    
+
     shuffledCups = generateCups(levelData.cupCount, levelData.duplicateColors || 0);
     correctOrder = [...shuffledCups].sort(() => Math.random() - 0.5);
-    
+
     displayCupsInStack(shuffledCups);
     createCupSlots(levelData.cupCount);
-    
+
     startTimer(levelData.timeLimit);
 }
 
@@ -154,52 +135,90 @@ function addTouchEvents(cupElement) {
 // Drag and Drop Functions for Desktop
 function dragStart(event) {
     selectedCupElement = event.target;
-    event.dataTransfer.setData('text/plain', event.target.style.backgroundColor);
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/html', event.target.outerHTML); // Save the HTML of the element
+    setTimeout(() => (selectedCupElement.style.opacity = '0.5'), 0); // Add visual feedback
 }
 
 function dragOver(event) {
     event.preventDefault(); // Necessary to allow drop
+    event.dataTransfer.dropEffect = 'move'; // Indicate that a move is happening
+    const target = event.target;
+
+    if (target.classList.contains('cup-slot') && target !== draggedOverElement) {
+        draggedOverElement = target;
+        highlightDropTarget(target);
+    }
 }
 
 function drop(event) {
     event.preventDefault();
-    const targetSlot = event.target;
 
+    const targetSlot = draggedOverElement || event.target;
     if (targetSlot.classList.contains('cup-slot') && selectedCupElement) {
-        swapCups(targetSlot);
+        swapCups(targetSlot); // Perform the cup swap
     }
+    clearDragState();
 }
 
 function swapCups(targetSlot) {
     const targetCup = targetSlot.querySelector('.cup');
 
     if (targetCup) {
-        selectedCupElement.parentElement.appendChild(targetCup); // Swap cups
+        selectedCupElement.parentElement.appendChild(targetCup); // Swap cups if a cup exists in the target slot
     }
 
-    targetSlot.appendChild(selectedCupElement);
+    targetSlot.appendChild(selectedCupElement); // Move the dragged cup to the target slot
+    clearDragState();
+}
+
+function highlightDropTarget(target) {
+    removeHighlightFromSlots(); // Remove highlight from previous target
+    target.classList.add('highlight-slot'); // Add highlight to current target
+}
+
+function removeHighlightFromSlots() {
+    document.querySelectorAll('.highlight-slot').forEach(slot => slot.classList.remove('highlight-slot'));
+}
+
+function clearDragState() {
+    if (selectedCupElement) {
+        selectedCupElement.style.opacity = '1'; // Reset opacity after drag or touch ends
+    }
     selectedCupElement = null;
+    draggedOverElement = null;
+    removeHighlightFromSlots(); // Clear any highlights from drop targets
 }
 
 // Touch Functions for Mobile
 function touchStart(event) {
     selectedCupElement = event.target;
+    selectedCupElement.style.opacity = '0.5'; // Add visual feedback
 }
 
 function touchMove(event) {
     event.preventDefault();
     const touch = event.touches[0];
-    draggedOverElement = document.elementFromPoint(touch.clientX, touch.clientY);
+    const elementAtTouch = document.elementFromPoint(touch.clientX, touch.clientY);
+
+    if (elementAtTouch && elementAtTouch.classList.contains('cup-slot') && elementAtTouch !== draggedOverElement) {
+        draggedOverElement = elementAtTouch;
+        highlightDropTarget(draggedOverElement);
+    }
 }
 
 function touchEnd() {
     if (draggedOverElement && draggedOverElement.classList.contains('cup-slot') && selectedCupElement) {
-        swapCups(draggedOverElement); // Swap cups using touch
+        swapCups(draggedOverElement); // Perform the cup swap using touch
     }
+    clearDragState();
     resetTouchVariables();
 }
 
 function resetTouchVariables() {
+    if (selectedCupElement) {
+        selectedCupElement.style.opacity = '1'; // Reset opacity
+    }
     selectedCupElement = null;
     draggedOverElement = null;
 }
@@ -240,76 +259,50 @@ function handleLevelCompletion() {
         currentLevel++;
         startLevel();
     } else {
-        showModal('Congratulations! You have completed all levels!');
+        showModal('Congratulations! You completed all levels!');
         endGame();
     }
 }
 
-function startTimer(seconds) {
-    let timeLeft = seconds;
-    const timeLeftElement = document.getElementById('time-left');
-    timeLeftElement.innerText = timeLeft;
+function startTimer(timeLimit) {
+    let timeLeft = timeLimit;
+    document.getElementById('time-left').innerText = timeLeft;
 
     timerInterval = setInterval(() => {
-        updateTimeLeft(--timeLeft, timeLeftElement);
+        timeLeft--;
+        document.getElementById('time-left').innerText = timeLeft;
 
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
-            showModal('Time\'s up! Game over.');
-            endGame();
+            handleTimeUp();
         }
     }, 1000);
 }
 
-function updateTimeLeft(timeLeft, timeLeftElement) {
-    timeLeftElement.innerText = timeLeft;
-    if (timeLeft <= 10) {
-        timeLeftElement.classList.add('warning');
-    } else {
-        timeLeftElement.classList.remove('warning');
-    }
+function handleTimeUp() {
+    showModal('Time is up! Game Over!');
+    endGame();
 }
 
 function endGame() {
+    switchToPage('end-page');
     clearInterval(timerInterval);
-    switchToPage('home-page');
-    resetGame();
-}
-
-function resetGame() {
-    currentLevel = 0;
+    currentLevel = 0; // Reset the game to the first level
 }
 
 function switchToPage(pageId) {
-    document.getElementById('home-page').style.display = 'none';
-    document.getElementById('game-page').style.display = 'none';
+    document.querySelectorAll('.page').forEach(page => {
+        page.style.display = 'none';
+    });
     document.getElementById(pageId).style.display = 'block';
 }
 
 function showModal(message) {
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-
-    const modalContent = document.createElement('div');
-    modalContent.className = 'modal-content';
-
-    const modalText = document.createElement('p');
-    modalText.innerText = message;
-
-    const modalClose = document.createElement('button');
-    modalClose.innerText = 'Close';
-    modalClose.className = 'modal-close';
-    modalClose.addEventListener('click', () => closeModal(modal));
-
-    modalContent.appendChild(modalText);
-    modalContent.appendChild(modalClose);
-    modal.appendChild(modalContent);
-    document.body.appendChild(modal);
-
+    const modal = document.getElementById('message-modal');
+    modal.querySelector('.modal-message').innerText = message;
     modal.style.display = 'block';
-}
 
-function closeModal(modal) {
-    modal.style.display = 'none';
-    modal.remove();
+    modal.querySelector('.modal-close').addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
 }

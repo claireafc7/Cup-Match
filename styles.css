@@ -43,6 +43,10 @@ button {
     transition: background-color 0.3s, color 0.3s;
 }
 
+.highlight-slot {
+    border: 2px dashed #000; 
+}
+
 button:hover {
     background-color: #eee;
 }
