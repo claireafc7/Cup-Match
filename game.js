@@ -12,7 +12,7 @@ const levels = [
     { cupCount: 8, timeLimit: 60 },
     { cupCount: 9, timeLimit: 60 },
     { cupCount: 10, timeLimit: 60 },
-    { cupCount: 10, timeLimit: 75, duplicateColors: 2 },  // Levels with duplicate colors
+    { cupCount: 10, timeLimit: 75, duplicateColors: 2 },
     { cupCount: 10, timeLimit: 60, duplicateColors: 2 },
     { cupCount: 12, timeLimit: 75, duplicateColors: 4 },
     { cupCount: 12, timeLimit: 60, duplicateColors: 4 },
@@ -35,6 +35,25 @@ function setupEventListeners() {
     document.getElementById('start-game').addEventListener('click', startGame);
     document.getElementById('end-game').addEventListener('click', endGame);
     document.getElementById('check-arrangement').addEventListener('click', checkArrangement);
+
+    // How to Play Modal Event Listeners
+    const howToPlayButton = document.getElementById('how-to-play-button');
+    const howToPlayModal = document.getElementById('how-to-play-modal');
+    const closeHowToPlayButton = document.getElementById('close-how-to-play');
+
+    howToPlayButton.addEventListener('click', () => {
+        howToPlayModal.style.display = 'block';
+    });
+
+    closeHowToPlayButton.addEventListener('click', () => {
+        howToPlayModal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (event) => {
+        if (event.target == howToPlayModal) {
+            howToPlayModal.style.display = 'none';
+        }
+    });
 }
 
 function preventPageRefresh() {
@@ -294,6 +313,3 @@ function closeModal(modal) {
     modal.style.display = 'none';
     modal.remove();
 }
-
-
-
