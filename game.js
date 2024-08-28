@@ -136,8 +136,8 @@ function createCupElement(color) {
 }
 
 function addTouchEvents(cupElement) {
-    cupElement.addEventListener('touchstart', touchStart);
-    cupElement.addEventListener('touchmove', touchMove);
+    cupElement.addEventListener('touchstart', touchStart, { passive: false });
+    cupElement.addEventListener('touchmove', touchMove, { passive: false });
     cupElement.addEventListener('touchend', touchEnd);
 }
 
@@ -151,6 +151,7 @@ function dragStart(event) {
 function dragEnd(event) {
     if (isPaused) return;
     selectedCupElement.classList.remove('dragging');
+    selectedCupElement = null;
 }
 
 function dragOver(event) {
@@ -160,9 +161,9 @@ function dragOver(event) {
 function drop(event) {
     event.preventDefault();
     if (isPaused) return;
-    const targetSlot = event.target;
+    const targetSlot = event.target.closest('.cup-slot');
 
-    if (targetSlot.classList.contains('cup-slot') && selectedCupElement) {
+    if (targetSlot && selectedCupElement) {
         swapCups(targetSlot);
     }
 }
@@ -190,9 +191,10 @@ function touchMove(event) {
     if (isPaused) return;
     event.preventDefault();
     const touch = event.touches[0];
-    draggedOverElement = document.elementFromPoint(touch.clientX, touch.clientY);
+    const touchedElement = document.elementFromPoint(touch.clientX, touch.clientY);
 
-    if (draggedOverElement && draggedOverElement.classList.contains('cup-slot')) {
+    if (touchedElement && touchedElement.classList.contains('cup-slot')) {
+        draggedOverElement = touchedElement;
         draggedOverElement.classList.add('highlight');
     } else {
         document.querySelectorAll('.cup-slot.highlight').forEach(el => el.classList.remove('highlight'));
@@ -211,7 +213,9 @@ function resetTouchVariables() {
     if (draggedOverElement) {
         draggedOverElement.classList.remove('highlight');
     }
-    selectedCupElement.classList.remove('dragging'); // Remove dragging class
+    if (selectedCupElement) {
+        selectedCupElement.classList.remove('dragging'); // Remove dragging class
+    }
     selectedCupElement = null;
     draggedOverElement = null;
 }
@@ -242,7 +246,7 @@ function getArrangedCups() {
 
 function calculateCorrectCups(arrangedCups) {
     return arrangedCups.reduce((count, color, index) => {
-        return color === correctOrder[index] ? count + 1 : count;
+        return count + (color === correctOrder[index] ? 1 : 0);
     }, 0);
 }
 
@@ -262,7 +266,7 @@ function handleLevelCompletion() {
 function startTimer(seconds) {
     let timeLeft = seconds;
     const timeLeftElement = document.getElementById('time-left');
-    timeLeftElement.innerText = timeLeft;
+    updateTimeLeft(timeLeft, timeLeftElement);
 
     timerInterval = setInterval(() => {
         if (!isPaused) {
