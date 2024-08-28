@@ -12,7 +12,7 @@ const levels = [
     { cupCount: 8, timeLimit: 60 },
     { cupCount: 9, timeLimit: 60 },
     { cupCount: 10, timeLimit: 60 },
-    { cupCount: 10, timeLimit: 75, duplicateColors: 2, extraCupCount: 2 }, // Example level
+    { cupCount: 10, timeLimit: 75, duplicateColors: 2, extraCupCount: 2 },
     { cupCount: 10, timeLimit: 60, duplicateColors: 2, extraCupCount: 2 },
     { cupCount: 12, timeLimit: 75, duplicateColors: 4, extraCupCount: 4 },
     { cupCount: 12, timeLimit: 60, duplicateColors: 4, extraCupCount: 4 },
@@ -43,7 +43,7 @@ function setupEventListeners() {
 function preventPageRefresh() {
     window.addEventListener('beforeunload', (event) => {
         event.preventDefault();
-        event.returnValue = ''; // Triggers confirmation dialog on refresh
+        event.returnValue = '';
     });
 }
 
@@ -57,7 +57,7 @@ function startLevel() {
     updateLevelInfo(levelData);
 
     shuffledCups = generateCups(levelData.cupCount, levelData.duplicateColors || 0, levelData.extraCupCount || 0);
-    correctOrder = shuffledCups.slice(0, levelData.cupCount - (levelData.extraCupCount || 0)); // The correct order excludes extra cups
+    correctOrder = shuffledCups.slice(0, levelData.cupCount - (levelData.extraCupCount || 0));
 
     displayCupsInStack(shuffledCups);
     createCupSlots(levelData.cupCount);
@@ -74,21 +74,18 @@ function generateCups(count, duplicateColors = 0, extraCupCount = 0) {
     const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown', 'beige', 'teal'];
     let selectedColors = colors.slice(0, count - duplicateColors);
 
-    // Add duplicate colors
     for (let i = 0; i < duplicateColors; i++) {
         selectedColors.push(selectedColors[Math.floor(Math.random() * selectedColors.length)]);
     }
 
-    // Shuffle to mix duplicates
     let allCups = shuffleArray(selectedColors);
 
-    // Add extra cups if specified
     if (extraCupCount > 0) {
         const extraColors = shuffleArray(colors.slice(0, Math.min(colors.length, extraCupCount)));
         allCups = allCups.concat(extraColors.slice(0, extraCupCount));
     }
 
-    return shuffleArray(allCups); // Final shuffle to mix all cups
+    return shuffleArray(allCups);
 }
 
 function shuffleArray(array) {
@@ -97,7 +94,7 @@ function shuffleArray(array) {
 
 function displayCupsInStack(cups) {
     const stackContainer = document.getElementById('stack-container');
-    stackContainer.innerHTML = ''; // Clear previous cups
+    stackContainer.innerHTML = '';
 
     cups.forEach(color => {
         const cupElement = createCupElement(color);
@@ -107,7 +104,7 @@ function displayCupsInStack(cups) {
 
 function createCupSlots(count) {
     const arrangementContainer = document.getElementById('arrangement-container');
-    arrangementContainer.innerHTML = ''; // Clear previous slots
+    arrangementContainer.innerHTML = '';
 
     for (let i = 0; i < count; i++) {
         const slotElement = createCupSlotElement(i);
@@ -242,6 +239,9 @@ function checkArrangement() {
     const slots = Array.from(document.querySelectorAll('.cup-slot'));
     const currentArrangement = slots.map(slot => slot.querySelector('.cup')?.style.backgroundColor || null);
 
+    console.log('Current Arrangement:', currentArrangement);
+    console.log('Correct Order:', correctOrder);
+
     const correctCount = currentArrangement.reduce((count, color, index) => {
         return color === correctOrder[index] ? count + 1 : count;
     }, 0);
@@ -286,7 +286,7 @@ function handleTimeUp() {
 function endGame() {
     switchToPage('end-page');
     clearInterval(timerInterval);
-    currentLevel = 0; // Reset the game to the first level
+    currentLevel = 0;
 }
 
 function switchToPage(pageId) {
@@ -319,3 +319,4 @@ function togglePauseGame() {
         pauseButton.innerText = 'Pause';
     }
 }
+
