@@ -2,7 +2,7 @@
 const levels = [
     { cupCount: 3, timeLimit: 60 },
     { cupCount: 12, timeLimit: 75, duplicateColors: 11 },
-    { cupCount: 12, timeLimit: 90, extraCups: 4 }, // New levels
+    { cupCount: 12, timeLimit: 90, extraCups: 4 },
     { cupCount: 14, timeLimit: 90, extraCups: 6 }
 ];
 
@@ -224,7 +224,7 @@ function checkArrangement() {
     if (slotsFilledCorrectly) {
         handleLevelCompletion();
     } else {
-        showModal(`${correctCount} out of ${correctOrder.length} cups are correctly placed. Try again!`);
+        showModal(`Only ${correctCount} out of ${correctOrder.length} cups are correctly placed. Try again!`);
     }
 }
 
