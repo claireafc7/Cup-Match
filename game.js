@@ -1,7 +1,7 @@
 // Game Configuration and State Variables
 const levels = [
     { cupCount: 3, timeLimit: 60 },
-    { cupCount: 12, timeLimit: 75, duplicateColors: 12 },
+    { cupCount: 12, timeLimit: 75, duplicateColors: 11 },
     { cupCount: 12, timeLimit: 90, extraCups: 4 }, // New levels
     { cupCount: 14, timeLimit: 90, extraCups: 6 }
 ];
