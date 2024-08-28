@@ -155,6 +155,8 @@ function addTouchEvents(cupElement) {
 function dragStart(event) {
     selectedCupElement = event.target;
     event.dataTransfer.setData('text/plain', event.target.style.backgroundColor);
+    // Delay the dragging feedback for a smoother experience
+    setTimeout(() => selectedCupElement.style.visibility = 'hidden', 0);
 }
 
 function dragOver(event) {
@@ -168,6 +170,8 @@ function drop(event) {
     if (targetSlot.classList.contains('cup-slot') && selectedCupElement) {
         swapCups(targetSlot);
     }
+    selectedCupElement.style.visibility = 'visible';
+    selectedCupElement = null; // Reset the selected cup
 }
 
 function swapCups(targetSlot) {
@@ -178,18 +182,22 @@ function swapCups(targetSlot) {
     }
 
     targetSlot.appendChild(selectedCupElement);
-    selectedCupElement = null;
 }
 
 // Touch Functions for Mobile
 function touchStart(event) {
     selectedCupElement = event.target;
+    selectedCupElement.style.position = 'absolute'; // Prepare for dragging
 }
 
 function touchMove(event) {
     event.preventDefault();
     const touch = event.touches[0];
     draggedOverElement = document.elementFromPoint(touch.clientX, touch.clientY);
+    
+    // Update the position of the selected cup
+    selectedCupElement.style.left = `${touch.clientX - selectedCupElement.offsetWidth / 2}px`;
+    selectedCupElement.style.top = `${touch.clientY - selectedCupElement.offsetHeight / 2}px`;
 }
 
 function touchEnd() {
@@ -200,6 +208,9 @@ function touchEnd() {
 }
 
 function resetTouchVariables() {
+    selectedCupElement.style.position = ''; // Reset position
+    selectedCupElement.style.left = '';
+    selectedCupElement.style.top = '';
     selectedCupElement = null;
     draggedOverElement = null;
 }
@@ -313,3 +324,4 @@ function closeModal(modal) {
     modal.style.display = 'none';
     modal.remove();
 }
+
