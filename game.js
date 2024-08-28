@@ -21,13 +21,13 @@ const levels = [
 
 let currentLevel = 0;   // Tracks the current level
 let presetArrangement = [];
-let userArrangement = [];
 let gameTimer = null;
 let cupColors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'brown', 'cyan', 'magenta', 'lime', 'teal'];
 
 // Initialize the game for the current level
 function initGame() {
     const levelConfig = levels[currentLevel];
+    document.getElementById('level').textContent = `Level ${currentLevel + 1}`;
     generatePresetArrangement(levelConfig);
     createCups(levelConfig);
     createSlots(levelConfig.cupCount);
@@ -133,6 +133,7 @@ function shuffleArray(array) {
 // Start the game timer
 function startTimer(timeLimit) {
     const startTime = Date.now();
+    const timerElement = document.getElementById('timer');
     gameTimer = setInterval(() => {
         const timeElapsed = Math.floor((Date.now() - startTime) / 1000);
         const timeRemaining = timeLimit - timeElapsed;
@@ -142,7 +143,12 @@ function startTimer(timeLimit) {
             alert('Time\'s up! Game over.');
             window.location.reload(); // Restart the game
         } else {
-            document.getElementById('timer').textContent = `Time remaining: ${timeRemaining}s`;
+            timerElement.textContent = `Time remaining: ${timeRemaining}s`;
+            if (timeRemaining <= 10) {
+                timerElement.classList.add('red');
+            } else {
+                timerElement.classList.remove('red');
+            }
         }
     }, 1000);
 }

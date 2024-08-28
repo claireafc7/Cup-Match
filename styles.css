@@ -1,70 +1,101 @@
+/* General Styles */
 body {
-    font-family: Arial, sans-serif;
-    background-color: burlywood;
-    color: #333;
     margin: 0;
-    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: white;
+    color: burlywood;
     text-align: center;
+}
+
+.screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
 }
 
 .hidden {
     display: none;
 }
 
-#home-screen {
-    padding-top: 50px;
-}
-
 button {
-    padding: 10px 20px;
+    padding: 15px 30px;
     font-size: 18px;
     margin: 10px;
     cursor: pointer;
+    border: none;
+    border-radius: 5px;
 }
 
-button.green-btn {
+h1, h2, h3 {
+    margin: 10px;
+}
+
+.header {
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 2.5rem;
+    color: burlywood;
+}
+
+h3 {
+    font-size: 2rem;
+    color: burlywood;
+}
+
+.cups-section, .slots-section {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.cup, .slot {
+    width: 60px;
+    height: 100px;
+    margin: 10px;
+    background-color: burlywood;
+    border-radius: 0 0 50px 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.cup {
+    background-color: burlywood;
+}
+
+.cup.dragging {
+    transform: scale(1.1);
+    opacity: 0.7;
+}
+
+.slot {
+    width: 80px;
+    height: 120px;
+    border: 2px dashed burlywood;
+}
+
+button.green {
     background-color: green;
     color: white;
 }
 
-button.red-btn {
+button.red {
     background-color: red;
     color: white;
 }
 
-button.orange-btn {
+button.orange {
     background-color: orange;
     color: white;
 }
 
-#cups-section, #slots-section {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-.cup {
-    width: 50px;
-    height: 80px;
-    background-color: #fff;
-    border: 2px solid #000;
-    border-radius: 10px 10px 50px 50px;
-    margin: 0 10px;
-    transition: transform 0.2s;
-}
-
-.cup.dragging {
-    opacity: 0.5;
-}
-
-.slot {
-    width: 60px;
-    height: 20px;
-    margin: 10px;
-    border: 2px dashed #333;
-    display: inline-block;
-}
-
+/* Modal Styles */
 .modal {
     display: none;
     position: fixed;
@@ -74,28 +105,34 @@ button.orange-btn {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0,0,0,0.4);
 }
 
 .modal-content {
     background-color: white;
     margin: 15% auto;
     padding: 20px;
-    border: 1px solid #888;
+    border: 1px solid burlywood;
     width: 80%;
-    max-width: 400px;
+    max-width: 500px;
+    text-align: center;
 }
 
-.modal .close {
-    color: #aaa;
+.close {
+    color: burlywood;
     float: right;
     font-size: 28px;
     font-weight: bold;
+    cursor: pointer;
 }
 
-.modal .close:hover,
-.modal .close:focus {
-    color: black;
+.close:hover,
+.close:focus {
+    color: red;
     text-decoration: none;
     cursor: pointer;
+}
+
+#timer.red {
+    color: red;
 }

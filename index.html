@@ -7,9 +7,8 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
     <!-- Home Screen -->
-    <div id="home-screen">
+    <div id="home-screen" class="screen">
         <h1>Cup Match</h1>
         <button id="start-game">Start Game</button>
         <button id="how-to-play">How to Play</button>
@@ -20,24 +19,31 @@
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2>How to Play</h2>
-            <p>Arrange the cups in the correct order as shown in the preset arrangement. You can drag and drop cups, swap them, or click them to return to the cup section. Press the "Check Arrangement" button to see how many are correct. Good luck!</p>
+            <p>Arrange the cups in the correct order within the time limit!</p>
+            <p>Drag and drop or tap to swap cups. Good luck!</p>
         </div>
     </div>
 
     <!-- Game Screen -->
-    <div id="game-screen" class="hidden">
-        <div id="cups-section"></div>
-        <div id="slots-section"></div>
-        <button id="check-arrangement" class="green-btn">Check Arrangement</button>
-        <button id="end-game" class="red-btn">End Game</button>
-        <button id="pause-game" class="orange-btn">Pause Game</button>
+    <div id="game-screen" class="screen hidden">
+        <div class="header">
+            <h2 id="level">Level 1</h2>
+            <h3 id="timer">Time remaining: 60s</h3>
+        </div>
+        <div id="cups-section" class="cups-section"></div>
+        <div id="slots-section" class="slots-section"></div>
+        <div class="controls">
+            <button id="check-arrangement" class="button green">Check Arrangement</button>
+            <button id="pause-game" class="button orange">Pause Game</button>
+            <button id="end-game" class="button red">End Game</button>
+        </div>
     </div>
 
-    <!-- Check Result Modal -->
+    <!-- Result Modal -->
     <div id="result-modal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Results</h2>
+            <h2>Result</h2>
             <p id="result-text"></p>
         </div>
     </div>
