@@ -12,7 +12,7 @@ const levels = [
     { cupCount: 8, timeLimit: 60 },
     { cupCount: 9, timeLimit: 60 },
     { cupCount: 10, timeLimit: 60 },
-    { cupCount: 10, timeLimit: 75, duplicateColors: 2, extraCupCount: 2 }, // Example level
+    { cupCount: 10, timeLimit: 75, duplicateColors: 2, extraCupCount: 2 },
     { cupCount: 10, timeLimit: 60, duplicateColors: 2, extraCupCount: 2 },
     { cupCount: 12, timeLimit: 75, duplicateColors: 4, extraCupCount: 4 },
     { cupCount: 12, timeLimit: 60, duplicateColors: 4, extraCupCount: 4 },
@@ -221,7 +221,6 @@ function clearDragState() {
 
 // Touch Functions for Mobile
 function touchStart(event) {
-    console.log('Touch start.');
     selectedCupElement = event.target;
     selectedCupElement.style.opacity = '0.5'; // Add visual feedback
 }
@@ -238,11 +237,25 @@ function touchMove(event) {
 }
 
 function touchEnd() {
-    console.log('Touch end.');
-    if (draggedOverElement && selectedCupElement) {
-        swapCups(draggedOverElement);
+    if (draggedOverElement && draggedOverElement.classList.contains('cup-slot') && selectedCupElement) {
+        swapCups(draggedOverElement); // Perform the cup swap using touch
     }
     clearDragState();
+    resetTouchVariables();
+}
+
+function resetTouchVariables() {
+    if (selectedCupElement) {
+        selectedCupElement.style.opacity = '1'; // Reset opacity
+    }
+    selectedCupElement = null;
+    draggedOverElement = null;
+}
+
+function returnCupToStack(event) {
+    if (event.target.classList.contains('cup')) {
+        document.getElementById('stack-container').appendChild(event.target); // Return cup to stack if clicked
+    }
 }
 
 // Timer Functions
@@ -250,6 +263,9 @@ function startTimer(timeLimit) {
     console.log('Starting timer.');
     const timeLeftElement = document.getElementById('time-left');
     let timeLeft = timeLimit;
+
+    timeLeftElement.innerText = timeLeft; // Initialize timer display
+    timeLeftElement.classList.remove('warning'); // Reset warning class
 
     timerInterval = setInterval(() => {
         timeLeft--;
@@ -262,7 +278,7 @@ function startTimer(timeLimit) {
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
             timeLeftElement.classList.remove('warning');
-            alert('Time\'s up!');
+            showModal('Time\'s up! Game Over!');
             endGame();
         }
     }, 1000);
@@ -285,18 +301,33 @@ function checkArrangement() {
     const slots = Array.from(document.querySelectorAll('.cup-slot'));
     const currentArrangement = slots.map(slot => slot.querySelector('.cup')?.style.backgroundColor || null);
 
-    if (JSON.stringify(currentArrangement) === JSON.stringify(correctOrder)) {
-        alert('Correct arrangement! Moving to the next level.');
+    const correctCount = currentArrangement.reduce((count, color, index) => {
+        return color === correctOrder[index] ? count + 1 : count;
+    }, 0);
+
+    if (correctCount === correctOrder.length) {
+        showModal('Correct arrangement! Moving to the next level.');
         currentLevel++;
         if (currentLevel >= levels.length) {
-            alert('Congratulations! You have completed all levels.');
+            showModal('Congratulations! You have completed all levels.');
             endGame();
         } else {
             startLevel();
         }
     } else {
-        alert('Incorrect arrangement. Try again!');
+        showModal(`${correctCount} out of ${correctOrder.length} cups are correct. Try again!`);
     }
+}
+
+function showModal(message) {
+    console.log('Showing modal:', message);
+    const modal = document.getElementById('message-modal');
+    modal.querySelector('.modal-message').innerText = message;
+    modal.style.display = 'block';
+
+    modal.querySelector('.modal-close').addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
 }
 
 function endGame() {
@@ -319,8 +350,3 @@ function closeHowToPlay() {
     document.getElementById('how-to-play-modal').style.display = 'none';
 }
 
-function returnCupToStack(event) {
-    if (event.target.classList.contains('cup')) {
-        event.target.parentElement.appendChild(event.target); // Return cup to stack if clicked
-    }
-}
