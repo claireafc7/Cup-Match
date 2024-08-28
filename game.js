@@ -272,29 +272,44 @@ function updateTimeLeft(timeLeft, timeLeftElement) {
 
 function endGame() {
     clearInterval(timerInterval);
+    switchToPage('home-page');
+    resetGame();
+}
+
+function resetGame() {
     currentLevel = 0;
-    switchToPage('welcome-page');
 }
 
 function switchToPage(pageId) {
-    const pages = document.querySelectorAll('.page');
-    pages.forEach(page => page.style.display = 'none');
+    document.getElementById('home-page').style.display = 'none';
+    document.getElementById('game-page').style.display = 'none';
     document.getElementById(pageId).style.display = 'block';
 }
 
 function showModal(message) {
-    const modal = document.getElementById('message-modal');
-    const modalContent = modal.querySelector('.modal-content p');
-    modalContent.innerText = message;
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+
+    const modalContent = document.createElement('div');
+    modalContent.className = 'modal-content';
+
+    const modalText = document.createElement('p');
+    modalText.innerText = message;
+
+    const modalClose = document.createElement('button');
+    modalClose.innerText = 'Close';
+    modalClose.className = 'modal-close';
+    modalClose.addEventListener('click', () => closeModal(modal));
+
+    modalContent.appendChild(modalText);
+    modalContent.appendChild(modalClose);
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+
     modal.style.display = 'block';
+}
 
-    modal.querySelector('.close').addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-
-    window.addEventListener('click', (event) => {
-        if (event.target == modal) {
-            modal.style.display = 'none';
-        }
-    });
+function closeModal(modal) {
+    modal.style.display = 'none';
+    modal.remove();
 }
