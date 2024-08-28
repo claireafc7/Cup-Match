@@ -1,7 +1,7 @@
 // Game Configuration and State Variables
 const levels = [
     { cupCount: 3, timeLimit: 60 },
-    { cupCount: 12, timeLimit: 90, duplicateColors: 12 },
+    { cupCount: 12, timeLimit: 75, duplicateColors: 12 },
     { cupCount: 12, timeLimit: 90, extraCups: 4 }, // New levels
     { cupCount: 14, timeLimit: 90, extraCups: 6 }
 ];
@@ -62,16 +62,11 @@ function updateLevelInfo(levelData) {
 
 function generateCups(count, duplicateColors = 0) {
     const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown', 'beige', 'teal'];
-    let selectedColors = colors.slice(0, count);
+    let selectedColors = colors.slice(0, count - duplicateColors);
 
-    // Add duplicate colors if needed
+    // Add duplicate colors
     for (let i = 0; i < duplicateColors; i++) {
         selectedColors.push(selectedColors[Math.floor(Math.random() * selectedColors.length)]);
-    }
-
-    // Handle case where all cups are the same color
-    if (duplicateColors >= count) {
-        selectedColors = [selectedColors[0]].repeat(count); // All cups will be the same color
     }
 
     return shuffleArray(selectedColors);
@@ -118,6 +113,7 @@ function createCupElement(color) {
 
     // Event listeners for drag and touch actions
     cupElement.addEventListener('dragstart', dragStart);
+    cupElement.addEventListener('dragend', dragEnd); // Added for smooth drag end
     cupElement.addEventListener('click', returnCupToStack);
     addTouchEvents(cupElement);
 
@@ -125,8 +121,8 @@ function createCupElement(color) {
 }
 
 function addTouchEvents(cupElement) {
-    cupElement.addEventListener('touchstart', touchStart);
-    cupElement.addEventListener('touchmove', touchMove);
+    cupElement.addEventListener('touchstart', touchStart, { passive: false });
+    cupElement.addEventListener('touchmove', touchMove, { passive: false });
     cupElement.addEventListener('touchend', touchEnd);
 }
 
@@ -134,8 +130,13 @@ function addTouchEvents(cupElement) {
 function dragStart(event) {
     if (isPaused) return;
     selectedCupElement = event.target;
-    event.dataTransfer.setData('text/plain', event.target.style.backgroundColor);
-    event.target.style.transform = 'scale(1.1)'; // Scale up for visual feedback
+    selectedCupElement.classList.add('dragging');
+}
+
+function dragEnd(event) {
+    if (isPaused) return;
+    selectedCupElement.classList.remove('dragging');
+    selectedCupElement = null;
 }
 
 function dragOver(event) {
@@ -145,9 +146,9 @@ function dragOver(event) {
 function drop(event) {
     event.preventDefault();
     if (isPaused) return;
-    const targetSlot = event.target;
+    const targetSlot = event.target.closest('.cup-slot');
 
-    if (targetSlot.classList.contains('cup-slot') && selectedCupElement) {
+    if (targetSlot && selectedCupElement) {
         swapCups(targetSlot);
     }
 }
@@ -160,7 +161,7 @@ function swapCups(targetSlot) {
     }
 
     targetSlot.appendChild(selectedCupElement);
-    selectedCupElement.style.transform = ''; // Reset scaling
+    selectedCupElement.classList.remove('dragging'); // Remove dragging class
     selectedCupElement = null;
 }
 
@@ -168,16 +169,17 @@ function swapCups(targetSlot) {
 function touchStart(event) {
     if (isPaused) return;
     selectedCupElement = event.target;
-    selectedCupElement.style.transform = 'scale(1.1)'; // Scale up for visual feedback
+    selectedCupElement.classList.add('dragging'); // Visual feedback for touch
 }
 
 function touchMove(event) {
     if (isPaused) return;
     event.preventDefault();
     const touch = event.touches[0];
-    draggedOverElement = document.elementFromPoint(touch.clientX, touch.clientY);
+    const touchedElement = document.elementFromPoint(touch.clientX, touch.clientY);
 
-    if (draggedOverElement && draggedOverElement.classList.contains('cup-slot')) {
+    if (touchedElement && touchedElement.classList.contains('cup-slot')) {
+        draggedOverElement = touchedElement;
         draggedOverElement.classList.add('highlight');
     } else {
         document.querySelectorAll('.cup-slot.highlight').forEach(el => el.classList.remove('highlight'));
@@ -196,7 +198,9 @@ function resetTouchVariables() {
     if (draggedOverElement) {
         draggedOverElement.classList.remove('highlight');
     }
-    selectedCupElement.style.transform = ''; // Reset scaling
+    if (selectedCupElement) {
+        selectedCupElement.classList.remove('dragging'); // Remove dragging class
+    }
     selectedCupElement = null;
     draggedOverElement = null;
 }
@@ -210,9 +214,6 @@ function checkArrangement() {
     if (isPaused) return;
     const arrangedCups = getArrangedCups();
     const correctCount = calculateCorrectCups(arrangedCups);
-
-    console.log('Arranged Cups:', arrangedCups);
-    console.log('Correct Order:', correctOrder);
 
     if (correctCount === correctOrder.length) {
         handleLevelCompletion();
@@ -230,32 +231,71 @@ function getArrangedCups() {
 
 function calculateCorrectCups(arrangedCups) {
     return arrangedCups.reduce((count, color, index) => {
-        return color === correctOrder[index] ? count + 1 : count;
+        return count + (color === correctOrder[index] ? 1 : 0);
     }, 0);
-}
-
-function startTimer(duration) {
-    let timeLeft = duration;
-    document.getElementById('time-left').innerText = timeLeft;
-    timerInterval = setInterval(() => {
-        if (isPaused) return;
-        timeLeft -= 1;
-        document.getElementById('time-left').innerText = timeLeft;
-        if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            showModal('Time\'s up! Game Over.');
-        }
-    }, 1000);
 }
 
 function handleLevelCompletion() {
     clearInterval(timerInterval);
-    currentLevel++;
-    if (currentLevel < levels.length) {
-        showModal('Level Completed! Proceeding to the next level.');
+
+    if (currentLevel + 1 < levels.length) {
+        showModal('Correct! Moving to the next level.');
+        currentLevel++;
+        startLevel();
     } else {
-        showModal('Congratulations! You have completed all levels.');
+        showModal('Congratulations! You have completed all levels!');
+        endGame();
     }
+}
+
+function startTimer(seconds) {
+    let timeLeft = seconds;
+    const timeLeftElement = document.getElementById('time-left');
+    updateTimeLeft(timeLeft, timeLeftElement);
+
+    timerInterval = setInterval(() => {
+        if (!isPaused) {
+            updateTimeLeft(--timeLeft, timeLeftElement);
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                showModal('Time\'s up! Game over.');
+                endGame();
+            }
+        }
+    }, 1000);
+}
+
+function updateTimeLeft(timeLeft, timeLeftElement) {
+    timeLeftElement.innerText = timeLeft;
+    if (timeLeft <= 10) {
+        timeLeftElement.classList.add('warning');
+    } else {
+        timeLeftElement.classList.remove('warning');
+    }
+}
+
+function togglePause() {
+    if (isPaused) {
+        isPaused = false;
+        document.getElementById('pause-game').innerText = 'Pause Game';
+        startTimer(parseInt(document.getElementById('time-left').innerText)); // Resume timer
+    } else {
+        isPaused = true;
+        document.getElementById('pause-game').innerText = 'Resume Game';
+        clearInterval(timerInterval); // Pause timer
+    }
+}
+
+function endGame() {
+    clearInterval(timerInterval);
+    switchToPage('home-page');
+    currentLevel = 0;
+}
+
+function switchToPage(pageId) {
+    document.querySelectorAll('.page').forEach(page => page.style.display = 'none');
+    document.getElementById(pageId).style.display = 'block';
 }
 
 function showModal(message) {
@@ -264,25 +304,11 @@ function showModal(message) {
     modal.style.display = 'block';
 }
 
+function showInstructions() {
+    const instructionsModal = document.getElementById('instructions-modal');
+    instructionsModal.style.display = 'block';
+}
+
 function closeModal(modal) {
     modal.style.display = 'none';
-}
-
-function togglePause() {
-    isPaused = !isPaused;
-    document.getElementById('pause-game').innerText = isPaused ? 'Resume' : 'Pause';
-}
-
-function endGame() {
-    clearInterval(timerInterval);
-    switchToPage('home-page');
-}
-
-function showInstructions() {
-    document.getElementById('instructions-modal').style.display = 'block';
-}
-
-function switchToPage(pageId) {
-    document.querySelectorAll('.page').forEach(page => page.style.display = 'none');
-    document.getElementById(pageId).style.display = 'flex';
 }
