@@ -62,7 +62,11 @@ button:hover {
     color: white;
 }
 
-/* New Button for How to Play Instructions */
+#pause-game {
+    background-color: orange;
+    color: white;
+}
+
 #instructions-button {
     background-color: cornflowerblue;
     color: white;
@@ -128,6 +132,10 @@ button:hover {
     justify-content: center;
     margin: 0 5px;
     position: relative;
+}
+
+.cup-slot.highlight {
+    border: 2px solid orange; /* Highlight color for mobile */
 }
 
 /* Game Page Styling */
@@ -273,8 +281,3 @@ button:hover {
         font-size: 1rem;
     }
 }
-
-
-
-
-
