@@ -26,7 +26,6 @@ let timerInterval;
 let shuffledCups = [];
 let correctOrder = [];
 let selectedCupElement = null;
-let draggedOverElement = null;
 let isPaused = false;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -180,13 +179,15 @@ function dragOver(event) {
 
 function drop(event) {
     event.preventDefault();
-    const targetSlot = event.target;
+    const targetSlot = event.target.closest('.cup-slot');
 
-    if (targetSlot.classList.contains('cup-slot') && selectedCupElement) {
-        swapCups(targetSlot);
+    if (targetSlot && selectedCupElement) {
+        if (targetSlot.childElementCount === 0) { // Only place if slot is empty
+            targetSlot.appendChild(selectedCupElement);
+            selectedCupElement.classList.remove('dragging');
+            selectedCupElement = null; // Reset the selected cup
+        }
     }
-    selectedCupElement.classList.remove('dragging');
-    selectedCupElement = null; // Reset the selected cup
 }
 
 function dragEnd() {
@@ -205,52 +206,37 @@ function touchStart(event) {
 function touchMove(event) {
     event.preventDefault();
     const touch = event.touches[0];
-    draggedOverElement = document.elementFromPoint(touch.clientX, touch.clientY);
-
-    // Update the position of the selected cup
     selectedCupElement.style.left = `${touch.clientX - selectedCupElement.offsetWidth / 2}px`;
     selectedCupElement.style.top = `${touch.clientY - selectedCupElement.offsetHeight / 2}px`;
 }
 
 function touchEnd() {
-    // Check if the dragged over element is a valid slot
-    if (draggedOverElement && draggedOverElement.classList.contains('cup-slot') && selectedCupElement) {
-        // Perform the swap
-        swapCups(draggedOverElement); 
+    // Check if the dragged element is placed in a valid slot
+    const targetSlot = document.elementFromPoint(event.changedTouches[0].clientX, event.changedTouches[0].clientY);
+    if (targetSlot && targetSlot.classList.contains('cup-slot') && selectedCupElement) {
+        if (targetSlot.childElementCount === 0) { // Only place if slot is empty
+            targetSlot.appendChild(selectedCupElement);
+        } else {
+            returnCupToStack({ target: selectedCupElement });
+        }
     } else {
-        // Return cup to stack if not placed in a valid slot
         returnCupToStack({ target: selectedCupElement });
     }
     resetTouchVariables();
 }
 
 function resetTouchVariables() {
-    selectedCupElement.style.position = ''; // Reset position
-    selectedCupElement.style.left = '';
-    selectedCupElement.style.top = '';
-    selectedCupElement.style.zIndex = '';
-    selectedCupElement = null;
-    draggedOverElement = null;
+    if (selectedCupElement) {
+        selectedCupElement.style.position = ''; // Reset position
+        selectedCupElement.style.left = '';
+        selectedCupElement.style.top = '';
+        selectedCupElement.style.zIndex = '';
+        selectedCupElement = null;
+    }
 }
 
 function returnCupToStack(event) {
     document.getElementById('stack-container').appendChild(event.target); // Return cup to stack
-}
-
-function swapCups(targetSlot) {
-    const targetCup = targetSlot.querySelector('.cup');
-
-    if (targetCup) {
-        selectedCupElement.parentElement.appendChild(targetCup); // Swap cups
-    }
-
-    targetSlot.appendChild(selectedCupElement);
-
-    // Add smooth transition
-    selectedCupElement.style.transition = 'transform 0.2s ease';
-    setTimeout(() => {
-        selectedCupElement.style.transition = ''; // Remove transition after applying
-    }, 200);
 }
 
 function checkArrangement() {
