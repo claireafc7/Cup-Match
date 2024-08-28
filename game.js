@@ -46,13 +46,11 @@ function startLevel() {
     updateLevelInfo(levelData);
 
     const totalCups = levelData.cupCount + (levelData.extraCups || 0);
-    const slotCount = levelData.cupCount;  // Keep slot count based on cupCount, not totalCups
     shuffledCups = generateCups(totalCups, levelData.duplicateColors || 0);
-    
-    correctOrder = [...shuffledCups].map((color, index) => `${color}-${index}`);  // Add unique identifiers
+    correctOrder = [...shuffledCups].sort(() => Math.random() - 0.5);
 
     displayCupsInStack(shuffledCups);
-    createCupSlots(slotCount);
+    createCupSlots(levelData.cupCount - (levelData.extraCups || 0)); // Adjust slot count based on extra cups
 
     startTimer(levelData.timeLimit);
 }
@@ -66,12 +64,14 @@ function generateCups(count, duplicateColors = 0) {
     const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown', 'beige', 'teal'];
     let selectedColors = colors.slice(0, count - duplicateColors);
 
-    // Add duplicate colors
+    // Generate duplicate cups with the same color
+    const duplicateColorIndex = Math.floor(Math.random() * selectedColors.length);
+    const duplicateColor = selectedColors[duplicateColorIndex];
     for (let i = 0; i < duplicateColors; i++) {
-        selectedColors.push(selectedColors[Math.floor(Math.random() * selectedColors.length)]);
+        selectedColors.push(duplicateColor);
     }
 
-    return shuffleArray(selectedColors).map((color, index) => `${color}-${index}`);  // Assign unique IDs
+    return shuffleArray(selectedColors);
 }
 
 function shuffleArray(array) {
@@ -82,9 +82,8 @@ function displayCupsInStack(cups) {
     const stackContainer = document.getElementById('stack-container');
     stackContainer.innerHTML = ''; // Clear previous cups
 
-    cups.forEach(cupId => {
-        const color = cupId.split('-')[0];  // Extract color
-        const cupElement = createCupElement(color, cupId);  // Pass cupId for identification
+    cups.forEach(color => {
+        const cupElement = createCupElement(color);
         stackContainer.appendChild(cupElement);
     });
 }
@@ -108,12 +107,11 @@ function createCupSlotElement(index) {
     return slotElement;
 }
 
-function createCupElement(color, id) {
+function createCupElement(color) {
     const cupElement = document.createElement('div');
     cupElement.className = 'cup';
     cupElement.style.backgroundColor = color;
     cupElement.setAttribute('draggable', true);
-    cupElement.dataset.id = id;  // Assign the unique ID
 
     // Event listeners for drag and touch actions
     cupElement.addEventListener('dragstart', dragStart);
@@ -229,66 +227,83 @@ function checkArrangement() {
 function getArrangedCups() {
     return [...document.getElementById('arrangement-container').children].map(slot => {
         const cup = slot.querySelector('.cup');
-        return cup ? cup.dataset.id : null;  // Return the unique ID instead of just color
+        return cup ? cup.style.backgroundColor : null;
     });
 }
 
 function calculateCorrectCups(arrangedCups) {
-    let correctCount = 0;
-    for (let i = 0; i < arrangedCups.length; i++) {
-        if (arrangedCups[i] === correctOrder[i]) {
-            correctCount++;
-        }
-    }
-    return correctCount;
+    return arrangedCups.reduce((count, color, index) => {
+        return count + (color === correctOrder[index] ? 1 : 0);
+    }, 0);
 }
 
 function handleLevelCompletion() {
     clearInterval(timerInterval);
+
     if (currentLevel + 1 < levels.length) {
+        showModal('Correct! Moving to the next level.');
         currentLevel++;
-        showModal('Level completed! Get ready for the next level.');
-        setTimeout(startLevel, 2000); // Delay before starting the next level
+        startLevel();
     } else {
         showModal('Congratulations! You have completed all levels!');
+        endGame();
     }
 }
 
-function startTimer(timeLimit) {
-    clearInterval(timerInterval); // Clear any previous timer
-    let timeLeft = timeLimit;
-    document.getElementById('time-left').innerText = timeLeft;
+function startTimer(seconds) {
+    let timeLeft = seconds;
+    const timeLeftElement = document.getElementById('time-left');
+    updateTimeLeft(timeLeft, timeLeftElement);
 
     timerInterval = setInterval(() => {
-        if (isPaused) return;
-        timeLeft--;
-        document.getElementById('time-left').innerText = timeLeft;
-        if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            showModal('Time\'s up! Try again.');
+        if (!isPaused) {
+            updateTimeLeft(--timeLeft, timeLeftElement);
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                showModal('Time\'s up! Game over.');
+                endGame();
+            }
         }
     }, 1000);
 }
 
-function togglePause() {
-    isPaused = !isPaused;
-    document.getElementById('pause-game').innerText = isPaused ? 'Resume' : 'Pause';
-    if (isPaused) {
-        clearInterval(timerInterval);
+function updateTimeLeft(timeLeft, timeLeftElement) {
+    timeLeftElement.innerText = timeLeft;
+    if (timeLeft <= 10) {
+        timeLeftElement.classList.add('warning');
     } else {
-        const timeLeft = parseInt(document.getElementById('time-left').innerText, 10);
-        startTimer(timeLeft);
+        timeLeftElement.classList.remove('warning');
     }
+}
+
+function togglePause() {
+    if (isPaused) {
+        isPaused = false;
+        document.getElementById('pause-game').innerText = 'Pause Game';
+        startTimer(parseInt(document.getElementById('time-left').innerText)); // Resume timer
+    } else {
+        isPaused = true;
+        document.getElementById('pause-game').innerText = 'Resume Game';
+        clearInterval(timerInterval); // Pause timer
+    }
+}
+
+function endGame() {
+    clearInterval(timerInterval);
+    switchToPage('home-page');
+    currentLevel = 0;
+}
+
+function switchToPage(pageId) {
+    document.querySelectorAll('.page').forEach(page => page.style.display = 'none');
+    document.getElementById(pageId).style.display = 'block';
 }
 
 function showModal(message) {
     const modal = document.getElementById('modal');
-    modal.querySelector('.modal-content p').innerText = message;
+    modal.querySelector('p').innerText = message;
     modal.style.display = 'block';
-}
-
-function closeModal(modal) {
-    modal.style.display = 'none';
 }
 
 function showInstructions() {
@@ -296,24 +311,6 @@ function showInstructions() {
     instructionsModal.style.display = 'block';
 }
 
-function endGame() {
-    if (confirm('Are you sure you want to end the game? Your progress will be lost.')) {
-        switchToPage('main-page');
-        resetGame();
-    }
-}
-
-function resetGame() {
-    currentLevel = 0;
-    clearInterval(timerInterval);
-    document.getElementById('time-left').innerText = '0';
-    document.getElementById('stack-container').innerHTML = '';
-    document.getElementById('arrangement-container').innerHTML = '';
-}
-
-function switchToPage(pageId) {
-    document.querySelectorAll('.page').forEach(page => {
-        page.style.display = 'none';
-    });
-    document.getElementById(pageId).style.display = 'block';
+function closeModal(modal) {
+    modal.style.display = 'none';
 }
