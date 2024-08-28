@@ -39,7 +39,7 @@ function setupEventListeners() {
     document.getElementById('end-game').addEventListener('click', endGame);
     document.getElementById('check-arrangement').addEventListener('click', checkArrangement);
     document.getElementById('pause-game').addEventListener('click', togglePause);
-    document.getElementById('instructions-button').addEventListener('click', showInstructions); // Instructions button
+    document.getElementById('instructions-button').addEventListener('click', showInstructions);
     document.getElementById('modal-close').addEventListener('click', () => closeModal(document.getElementById('modal')));
     document.getElementById('close-instructions').addEventListener('click', () => closeModal(document.getElementById('instructions-modal')));
 }
@@ -142,8 +142,10 @@ function addTouchEvents(cupElement) {
 
 // Drag and Drop Functions for Desktop
 function dragStart(event) {
+    if (isPaused) return;
     selectedCupElement = event.target;
     event.dataTransfer.setData('text/plain', event.target.style.backgroundColor);
+    event.target.style.transform = 'scale(1.1)'; // Scale up for visual feedback
 }
 
 function dragOver(event) {
@@ -152,6 +154,7 @@ function dragOver(event) {
 
 function drop(event) {
     event.preventDefault();
+    if (isPaused) return;
     const targetSlot = event.target;
 
     if (targetSlot.classList.contains('cup-slot') && selectedCupElement) {
@@ -167,45 +170,54 @@ function swapCups(targetSlot) {
     }
 
     targetSlot.appendChild(selectedCupElement);
+    selectedCupElement.style.transform = ''; // Reset scaling
     selectedCupElement = null;
 }
 
 // Touch Functions for Mobile
 function touchStart(event) {
+    if (isPaused) return;
     selectedCupElement = event.target;
+    selectedCupElement.style.transform = 'scale(1.1)'; // Scale up for visual feedback
 }
 
 function touchMove(event) {
+    if (isPaused) return;
     event.preventDefault();
     const touch = event.touches[0];
-    const touchElement = document.elementFromPoint(touch.clientX, touch.clientY);
+    draggedOverElement = document.elementFromPoint(touch.clientX, touch.clientY);
 
-    if (touchElement && touchElement.classList.contains('cup-slot')) {
-        touchElement.classList.add('highlight');
+    if (draggedOverElement && draggedOverElement.classList.contains('cup-slot')) {
+        draggedOverElement.classList.add('highlight');
     } else {
-        document.querySelectorAll('.cup-slot').forEach(slot => slot.classList.remove('highlight'));
+        document.querySelectorAll('.cup-slot.highlight').forEach(el => el.classList.remove('highlight'));
     }
 }
 
-function touchEnd(event) {
+function touchEnd() {
+    if (isPaused) return;
     if (draggedOverElement && draggedOverElement.classList.contains('cup-slot') && selectedCupElement) {
-        swapCups(draggedOverElement);
-    } else {
-        resetTouchVariables();
+        swapCups(draggedOverElement); // Swap cups using touch
     }
-    document.querySelectorAll('.cup-slot').forEach(slot => slot.classList.remove('highlight'));
+    resetTouchVariables();
 }
 
 function resetTouchVariables() {
+    if (draggedOverElement) {
+        draggedOverElement.classList.remove('highlight');
+    }
+    selectedCupElement.style.transform = ''; // Reset scaling
     selectedCupElement = null;
     draggedOverElement = null;
 }
 
 function returnCupToStack(event) {
+    if (isPaused) return;
     document.getElementById('stack-container').appendChild(event.target); // Return cup to stack
 }
 
 function checkArrangement() {
+    if (isPaused) return;
     const arrangedCups = getArrangedCups();
     const correctCount = calculateCorrectCups(arrangedCups);
 
@@ -248,12 +260,14 @@ function startTimer(seconds) {
     timeLeftElement.innerText = timeLeft;
 
     timerInterval = setInterval(() => {
-        updateTimeLeft(--timeLeft, timeLeftElement);
+        if (!isPaused) {
+            updateTimeLeft(--timeLeft, timeLeftElement);
 
-        if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            showModal('Time\'s up! Game over.');
-            endGame();
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                showModal('Time\'s up! Game over.');
+                endGame();
+            }
         }
     }, 1000);
 }
@@ -280,6 +294,7 @@ function togglePause() {
 }
 
 function endGame() {
+    clearInterval(timerInterval);
     switchToPage('home-page');
     currentLevel = 0;
 }
