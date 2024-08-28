@@ -21,6 +21,10 @@ body {
     align-items: center;
 }
 
+#game-page {
+    display: none;
+}
+
 h1 {
     color: burlywood;
     font-size: 200px;
@@ -58,12 +62,8 @@ button:hover {
     color: white;
 }
 
-#pause-game {
-    background-color: orange;
-    color: white;
-}
-
-#how-to-play-button {
+/* New Button for How to Play Instructions */
+#instructions-button {
     background-color: cornflowerblue;
     color: white;
 }
@@ -73,13 +73,13 @@ button:hover {
     justify-content: center;
     margin: 20px 0;
     gap: 10px;
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* Allow wrapping for better fit */
 }
 
 .cup-container {
     display: flex;
     gap: 10px;
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* Enable wrapping on all screen sizes */
     justify-content: center;
 }
 
@@ -130,10 +130,7 @@ button:hover {
     position: relative;
 }
 
-.highlight-slot {
-    border: 2px solid blue;
-}
-
+/* Game Page Styling */
 #level-info {
     margin: 20px 0;
 }
@@ -154,6 +151,7 @@ button:hover {
     color: red;
 }
 
+/* Modal Styling */
 .modal {
     display: none;
     position: fixed;
@@ -191,6 +189,7 @@ button:hover {
     cursor: pointer;
 }
 
+/* Responsive Design for Tablet Devices */
 @media (max-width: 1024px) {
     h1 {
         font-size: 50px;
@@ -216,6 +215,7 @@ button:hover {
     }
 }
 
+/* Responsive Design for Mobile Devices */
 @media (max-width: 768px) {
     h1 {
         font-size: 40px;
@@ -273,6 +273,7 @@ button:hover {
         font-size: 1rem;
     }
 }
+
 
 
 
