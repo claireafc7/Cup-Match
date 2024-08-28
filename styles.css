@@ -62,14 +62,13 @@ button:hover {
     color: white;
 }
 
-/* New Pause Button Styling */
 #pause-game {
     background-color: orange;
     color: white;
 }
 
 /* New Button for How to Play Instructions */
-#instructions-button {
+#how-to-play-button {
     background-color: cornflowerblue;
     color: white;
 }
@@ -98,7 +97,6 @@ button:hover {
     clip-path: polygon(20% 0%, 80% 0%, 90% 100%, 10% 100%);
     margin: 0 auto;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s ease;
 }
 
 .cup::before {
@@ -135,11 +133,6 @@ button:hover {
     justify-content: center;
     margin: 0 5px;
     position: relative;
-    transition: background-color 0.2s ease;
-}
-
-.cup-slot:hover {
-    background-color: #ddd;
 }
 
 /* Game Page Styling */
@@ -285,4 +278,5 @@ button:hover {
         font-size: 1rem;
     }
 }
+
 
