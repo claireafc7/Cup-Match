@@ -12,11 +12,11 @@ const levels = [
     { cupCount: 8, timeLimit: 60 },
     { cupCount: 9, timeLimit: 60 },
     { cupCount: 10, timeLimit: 60 },
-    { cupCount: 10, timeLimit: 75, duplicateColors: 2 }, // Example level
-    { cupCount: 10, timeLimit: 60, duplicateColors: 2 },
-    { cupCount: 12, timeLimit: 75, duplicateColors: 4 },
-    { cupCount: 12, timeLimit: 60, extraCupCount: 4 },
-    { cupCount: 12, timeLimit: 60, extraCupCount: 6 }
+    { cupCount: 10, timeLimit: 75, duplicateColors: 2, extraCupCount: 2 }, // Example level
+    { cupCount: 10, timeLimit: 60, duplicateColors: 2, extraCupCount: 2 },
+    { cupCount: 12, timeLimit: 75, duplicateColors: 4, extraCupCount: 4 },
+    { cupCount: 12, timeLimit: 60, duplicateColors: 4, extraCupCount: 4 },
+    { cupCount: 12, timeLimit: 60, duplicateColors: 6, extraCupCount: 6 }
 ];
 
 let currentLevel = 0;
@@ -36,6 +36,9 @@ function setupEventListeners() {
     document.getElementById('end-game').addEventListener('click', endGame);
     document.getElementById('check-arrangement').addEventListener('click', checkArrangement);
     document.getElementById('pause-game').addEventListener('click', togglePauseGame);
+
+    // Ensure buttons are being referenced correctly
+    console.log('Event listeners setup completed.');
 }
 
 function preventPageRefresh() {
@@ -330,4 +333,3 @@ function togglePauseGame() {
         pauseButton.innerText = 'Pause';
     }
 }
-
