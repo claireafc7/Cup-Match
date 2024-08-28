@@ -139,6 +139,7 @@ function createCupElement(color) {
 
     // Event listeners for drag and touch actions
     cupElement.addEventListener('dragstart', dragStart);
+    cupElement.addEventListener('dragend', dragEnd);
     cupElement.addEventListener('click', returnCupToStack);
     addTouchEvents(cupElement);
 
@@ -155,8 +156,12 @@ function addTouchEvents(cupElement) {
 function dragStart(event) {
     selectedCupElement = event.target;
     event.dataTransfer.setData('text/plain', event.target.style.backgroundColor);
-    // Delay the dragging feedback for a smoother experience
-    setTimeout(() => selectedCupElement.style.visibility = 'hidden', 0);
+    
+    // Disable default drag ghost image
+    event.dataTransfer.setDragImage(new Image(), 0, 0);
+    
+    // Add dragging class for visual feedback
+    selectedCupElement.classList.add('dragging');
 }
 
 function dragOver(event) {
@@ -170,24 +175,21 @@ function drop(event) {
     if (targetSlot.classList.contains('cup-slot') && selectedCupElement) {
         swapCups(targetSlot);
     }
-    selectedCupElement.style.visibility = 'visible';
+    selectedCupElement.classList.remove('dragging');
     selectedCupElement = null; // Reset the selected cup
 }
 
-function swapCups(targetSlot) {
-    const targetCup = targetSlot.querySelector('.cup');
-
-    if (targetCup) {
-        selectedCupElement.parentElement.appendChild(targetCup); // Swap cups
+function dragEnd() {
+    if (selectedCupElement) {
+        selectedCupElement.classList.remove('dragging');
     }
-
-    targetSlot.appendChild(selectedCupElement);
 }
 
 // Touch Functions for Mobile
 function touchStart(event) {
     selectedCupElement = event.target;
     selectedCupElement.style.position = 'absolute'; // Prepare for dragging
+    selectedCupElement.style.zIndex = '1000'; // Bring to the front
 }
 
 function touchMove(event) {
@@ -211,6 +213,7 @@ function resetTouchVariables() {
     selectedCupElement.style.position = ''; // Reset position
     selectedCupElement.style.left = '';
     selectedCupElement.style.top = '';
+    selectedCupElement.style.zIndex = '';
     selectedCupElement = null;
     draggedOverElement = null;
 }
@@ -219,6 +222,20 @@ function returnCupToStack(event) {
     document.getElementById('stack-container').appendChild(event.target); // Return cup to stack
 }
 
+function swapCups(targetSlot) {
+    const targetCup = targetSlot.querySelector('.cup');
+
+    if (targetCup) {
+        selectedCupElement.parentElement.appendChild(targetCup); // Swap cups
+    }
+
+    targetSlot.appendChild(selectedCupElement);
+
+    // Add smooth transition
+    selectedCupElement.style.transition = 'transform 0.2s ease';
+}
+
+// Arrangement Checking Functions
 function checkArrangement() {
     const arrangedCups = getArrangedCups();
     const correctCount = calculateCorrectCups(arrangedCups);
@@ -226,38 +243,33 @@ function checkArrangement() {
     if (correctCount === correctOrder.length) {
         handleLevelCompletion();
     } else {
-        showModal(`${correctCount} out of ${correctOrder.length} cups are correct. Try again!`);
+        showModal(`${correctCount} out of ${correctOrder.length} cups are correct.`);
     }
 }
 
 function getArrangedCups() {
-    return [...document.getElementById('arrangement-container').children].map(slot => {
-        const cup = slot.querySelector('.cup');
-        return cup ? cup.style.backgroundColor : null;
-    });
+    return Array.from(document.querySelectorAll('.cup-slot .cup')).map(cup => cup.style.backgroundColor);
 }
 
 function calculateCorrectCups(arrangedCups) {
-    return arrangedCups.reduce((count, color, index) => {
-        return color === correctOrder[index] ? count + 1 : count;
+    return arrangedCups.reduce((correctCount, color, index) => {
+        return correctCount + (color === correctOrder[index] ? 1 : 0);
     }, 0);
 }
 
 function handleLevelCompletion() {
-    clearInterval(timerInterval);
-
     if (currentLevel + 1 < levels.length) {
-        showModal('Correct! Moving to the next level.');
         currentLevel++;
-        startLevel();
+        showModal('Level completed! Moving to the next level.');
+        startLevel(); // Proceed to the next level
     } else {
         showModal('Congratulations! You have completed all levels!');
         endGame();
     }
 }
 
-function startTimer(seconds) {
-    let timeLeft = seconds;
+// Timer Functions
+function startTimer(timeLeft) {
     const timeLeftElement = document.getElementById('time-left');
     timeLeftElement.innerText = timeLeft;
 
@@ -324,5 +336,3 @@ function closeModal(modal) {
     modal.style.display = 'none';
     modal.remove();
 }
-
-
