@@ -203,8 +203,13 @@ function touchMove(event) {
 }
 
 function touchEnd() {
+    // Check if the dragged over element is a valid slot
     if (draggedOverElement && draggedOverElement.classList.contains('cup-slot') && selectedCupElement) {
-        swapCups(draggedOverElement); // Swap cups using touch
+        // Perform the swap
+        swapCups(draggedOverElement); 
+    } else {
+        // Return cup to stack if not placed in a valid slot
+        returnCupToStack({ target: selectedCupElement });
     }
     resetTouchVariables();
 }
@@ -233,9 +238,11 @@ function swapCups(targetSlot) {
 
     // Add smooth transition
     selectedCupElement.style.transition = 'transform 0.2s ease';
+    setTimeout(() => {
+        selectedCupElement.style.transition = ''; // Remove transition after applying
+    }, 200);
 }
 
-// Arrangement Checking Functions
 function checkArrangement() {
     const arrangedCups = getArrangedCups();
     const correctCount = calculateCorrectCups(arrangedCups);
