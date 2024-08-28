@@ -3,36 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cup Arrangement Game</title>
+    <title>Cup Game</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="start-page" class="page">
+    <div id="home-page" class="page">
+        <h1>Cup Game</h1>
         <button id="start-game">Start Game</button>
     </div>
-    
-    <div id="game-page" class="page" style="display:none;">
-        <div id="stack-container"></div>
-        <div id="arrangement-container"></div>
-        <div id="info">
+
+    <div id="game-page" class="page" style="display: none;">
+        <div id="level-info">
             <span id="level">Level 1</span>
             <span id="time-left">60</span>
         </div>
+        <div id="stack-container"></div>
+        <div id="arrangement-container"></div>
         <button id="check-arrangement">Check Arrangement</button>
         <button id="pause-game">Pause</button>
         <button id="end-game">End Game</button>
     </div>
-    
-    <div id="end-page" class="page" style="display:none;">
+
+    <div id="end-page" class="page" style="display: none;">
         <h2>Game Over</h2>
-        <button id="restart-game">Restart Game</button>
+        <button id="start-game">Restart Game</button>
     </div>
-    
-    <div id="message-modal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <span class="modal-close">&times;</span>
-            <p class="modal-message"></p>
-        </div>
+
+    <div id="message-modal" class="modal">
+        <div class="modal-message"></div>
+        <button class="modal-close">Close</button>
     </div>
 
     <script src="game.js"></script>

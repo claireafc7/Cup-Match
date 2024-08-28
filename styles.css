@@ -130,6 +130,10 @@ button:hover {
     position: relative;
 }
 
+.highlight-slot {
+    border: 2px solid blue;
+}
+
 #level-info {
     margin: 20px 0;
 }
@@ -269,6 +273,7 @@ button:hover {
         font-size: 1rem;
     }
 }
+
 
 
 

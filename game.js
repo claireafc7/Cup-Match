@@ -36,8 +36,6 @@ function setupEventListeners() {
     document.getElementById('end-game').addEventListener('click', endGame);
     document.getElementById('check-arrangement').addEventListener('click', checkArrangement);
     document.getElementById('pause-game').addEventListener('click', togglePauseGame);
-
-    console.log('Event listeners setup completed.');
 }
 
 function preventPageRefresh() {
@@ -234,32 +232,39 @@ function returnCupToStack(event) {
 }
 
 function checkArrangement() {
-    console.log('Checking arrangement.');
-
-    const slots = Array.from(document.querySelectorAll('.cup-slot'));
-    const currentArrangement = slots.map(slot => slot.querySelector('.cup')?.style.backgroundColor || null);
-
-    console.log('Current Arrangement:', currentArrangement);
-    console.log('Correct Order:', correctOrder);
-
-    const correctCount = currentArrangement.reduce((count, color, index) => {
-        return color === correctOrder[index] ? count + 1 : count;
-    }, 0);
-
-    console.log('Correct count:', correctCount);
-    console.log('Correct order length:', correctOrder.length);
+    const arrangedCups = getArrangedCups();
+    const correctCount = calculateCorrectCups(arrangedCups);
 
     if (correctCount === correctOrder.length) {
-        showModal('Correct arrangement! Moving to the next level.');
-        currentLevel++;
-        if (currentLevel >= levels.length) {
-            showModal('Congratulations! You have completed all levels.');
-            endGame();
-        } else {
-            startLevel();
-        }
+        handleLevelCompletion();
     } else {
         showModal(`${correctCount} out of ${correctOrder.length} cups are correct. Try again!`);
+    }
+}
+
+function getArrangedCups() {
+    return [...document.getElementById('arrangement-container').children].map(slot => {
+        const cup = slot.querySelector('.cup');
+        return cup ? cup.style.backgroundColor : null;
+    });
+}
+
+function calculateCorrectCups(arrangedCups) {
+    return arrangedCups.reduce((count, color, index) => {
+        return color === correctOrder[index] ? count + 1 : count;
+    }, 0);
+}
+
+function handleLevelCompletion() {
+    clearInterval(timerInterval);
+
+    if (currentLevel + 1 < levels.length) {
+        showModal('Correct! Moving to the next level.');
+        currentLevel++;
+        startLevel();
+    } else {
+        showModal('Congratulations! You completed all levels!');
+        endGame();
     }
 }
 
@@ -319,4 +324,5 @@ function togglePauseGame() {
         pauseButton.innerText = 'Pause';
     }
 }
+
 
