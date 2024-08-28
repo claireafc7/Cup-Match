@@ -12,11 +12,11 @@ const levels = [
     { cupCount: 8, timeLimit: 60 },
     { cupCount: 9, timeLimit: 60 },
     { cupCount: 10, timeLimit: 60 },
-    { cupCount: 10, timeLimit: 75, duplicateColors: 2 },
-    { cupCount: 10, timeLimit: 60, duplicateColors: 2 },
+    { cupCount: 10, timeLimit: 75, duplicateColors: 4 },
+    { cupCount: 10, timeLimit: 75, duplicateColors: 8 },
     { cupCount: 12, timeLimit: 75, duplicateColors: 4 },
-    { cupCount: 12, timeLimit: 60, duplicateColors: 4 },
-    { cupCount: 12, timeLimit: 60, duplicateColors: 6 }
+    { cupCount: 12, timeLimit: 75, duplicateColors: 8 },
+    { cupCount: 12, timeLimit: 75, duplicateColors: 12 }
 ];
 
 let currentLevel = 0;
@@ -71,13 +71,13 @@ function startGame() {
 function startLevel() {
     const levelData = levels[currentLevel];
     updateLevelInfo(levelData);
-    
+
     shuffledCups = generateCups(levelData.cupCount, levelData.duplicateColors || 0);
-    correctOrder = [...shuffledCups].sort(() => Math.random() - 0.5);
-    
+    correctOrder = [...shuffledCups]; // Correct order is the order of generated cups before shuffling
+
     displayCupsInStack(shuffledCups);
     createCupSlots(levelData.cupCount);
-    
+
     startTimer(levelData.timeLimit);
 }
 
@@ -194,7 +194,7 @@ function touchMove(event) {
     event.preventDefault();
     const touch = event.touches[0];
     draggedOverElement = document.elementFromPoint(touch.clientX, touch.clientY);
-    
+
     // Update the position of the selected cup
     selectedCupElement.style.left = `${touch.clientX - selectedCupElement.offsetWidth / 2}px`;
     selectedCupElement.style.top = `${touch.clientY - selectedCupElement.offsetHeight / 2}px`;
@@ -324,4 +324,5 @@ function closeModal(modal) {
     modal.style.display = 'none';
     modal.remove();
 }
+
 
