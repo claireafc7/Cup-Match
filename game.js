@@ -12,13 +12,13 @@ const levels = [
     { cupCount: 8, timeLimit: 60 },
     { cupCount: 9, timeLimit: 60 },
     { cupCount: 10, timeLimit: 60 },
-    { cupCount: 10, timeLimit: 75, duplicateColors: 2 },
-    { cupCount: 10, timeLimit: 60, duplicateColors: 2 },
+    { cupCount: 10, timeLimit: 75, duplicateColors: 4 },
+    { cupCount: 10, timeLimit: 75, duplicateColors: 8 },
     { cupCount: 12, timeLimit: 75, duplicateColors: 4 },
-    { cupCount: 12, timeLimit: 60, duplicateColors: 4 },
-    { cupCount: 12, timeLimit: 60, duplicateColors: 6 },
-    { cupCount: 12, timeLimit: 60, extraCups: 4 }, // New levels
-    { cupCount: 14, timeLimit: 60, extraCups: 6 }
+    { cupCount: 12, timeLimit: 75, duplicateColors: 8 },
+    { cupCount: 12, timeLimit: 75, duplicateColors: 12 },
+    { cupCount: 12, timeLimit: 90, extraCups: 4 }, // New levels
+    { cupCount: 14, timeLimit: 90, extraCups: 6 }
 ];
 
 let currentLevel = 0;
