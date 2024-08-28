@@ -21,10 +21,6 @@ body {
     align-items: center;
 }
 
-#game-page {
-    display: none;
-}
-
 h1 {
     color: burlywood;
     font-size: 200px;
@@ -67,7 +63,6 @@ button:hover {
     color: white;
 }
 
-/* New Button for How to Play Instructions */
 #how-to-play-button {
     background-color: cornflowerblue;
     color: white;
@@ -78,13 +73,13 @@ button:hover {
     justify-content: center;
     margin: 20px 0;
     gap: 10px;
-    flex-wrap: wrap; /* Allow wrapping for better fit */
+    flex-wrap: wrap;
 }
 
 .cup-container {
     display: flex;
     gap: 10px;
-    flex-wrap: wrap; /* Enable wrapping on all screen sizes */
+    flex-wrap: wrap;
     justify-content: center;
 }
 
@@ -135,7 +130,6 @@ button:hover {
     position: relative;
 }
 
-/* Game Page Styling */
 #level-info {
     margin: 20px 0;
 }
@@ -156,7 +150,6 @@ button:hover {
     color: red;
 }
 
-/* Modal Styling */
 .modal {
     display: none;
     position: fixed;
@@ -194,7 +187,6 @@ button:hover {
     cursor: pointer;
 }
 
-/* Responsive Design for Tablet Devices */
 @media (max-width: 1024px) {
     h1 {
         font-size: 50px;
@@ -220,7 +212,6 @@ button:hover {
     }
 }
 
-/* Responsive Design for Mobile Devices */
 @media (max-width: 768px) {
     h1 {
         font-size: 40px;
@@ -278,5 +269,6 @@ button:hover {
         font-size: 1rem;
     }
 }
+
 
 
