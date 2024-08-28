@@ -3,45 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cup Stacking Game</title>
+    <title>Cup Match</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Home Page -->
     <div id="home-page" class="page">
-        <h1>Welcome to Cup Stacking Game</h1>
+        <h1>Cup Match</h1>
         <button id="start-game">Start Game</button>
-        <button id="how-to-play-button">How to Play</button>
+        <button id="how-to-play-button">How to Play</button> <!-- Updated How to Play Button -->
     </div>
 
+    <!-- Game Page -->
     <div id="game-page" class="page" style="display: none;">
-        <h2 id="level">Level 1</h2>
+        <div id="level-info">
+            <span id="level">Level 1</span>
+            <span id="time-left">60</span> seconds
+        </div>
         <div id="stack-container" class="cup-container"></div>
         <div id="arrangement-container" class="cup-container"></div>
         <button id="check-arrangement">Check Arrangement</button>
+        <button id="pause-game">Pause Game</button>
         <button id="end-game">End Game</button>
-        <p>Time Left: <span id="time-left">60</span> seconds</p>
     </div>
 
     <!-- How to Play Modal -->
     <div id="how-to-play-modal" class="modal" style="display: none;">
         <div class="modal-content">
-            <span id="close-how-to-play" class="close-button">&times;</span>
             <h2>How to Play</h2>
-            <p>Drag and drop cups into the slots to match the original order.</p>
-        </div>
-    </div>
-
-    <!-- End Game Modal -->
-    <div id="modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <p></p>
+            <p>1. Arrange the cups in the correct order by dragging and dropping them.</p>
+            <p>2. You have a limited amount of time to complete each level.</p>
+            <p>3. From level 13 onwards, there will be duplicate cup colors to make it more challenging.</p>
+            <p>4. Some levels will include extra deceptive cups that do not need to be placed.</p>
+            <p>5. Once you are satisfied with your arrangement, click the 'Check Arrangement' button to see if you are correct.</p>
+            <p>6. If correct, you'll move on to the next level. If not, try again!</p>
+            <button id="close-how-to-play">Close</button>
         </div>
     </div>
 
     <script src="game.js"></script>
 </body>
 </html>
+
 
 
 

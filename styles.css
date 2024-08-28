@@ -1,78 +1,288 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    margin: 0;
-    padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
+    margin: 0;
+    background-color: whitesmoke;
 }
 
 .page {
     text-align: center;
+    width: 100%;
+    padding: 20px;
+}
+
+#home-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#game-page {
+    display: none;
+}
+
+h1 {
+    color: burlywood;
+    font-size: 200px;
+    margin-bottom: 20px;
 }
 
 button {
-    padding: 10px 20px;
-    font-size: 16px;
+    padding: 12px 24px;
+    border: 2px solid black;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1.1rem;
     margin: 10px;
+    background-color: #fff;
+    color: #000;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+button:hover {
+    background-color: #eee;
+}
+
+#start-game {
+    background-color: burlywood;
+    color: white;
+}
+
+#check-arrangement {
+    background-color: green;
+    color: white;
+}
+
+#end-game {
+    background-color: red;
+    color: white;
+}
+
+/* New Pause Button Styling */
+#pause-game {
+    background-color: orange;
+    color: white;
+}
+
+/* New Button for How to Play Instructions */
+#instructions-button {
+    background-color: cornflowerblue;
+    color: white;
+}
+
+#stack-container, #arrangement-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+    gap: 10px;
+    flex-wrap: wrap; /* Allow wrapping for better fit */
 }
 
 .cup-container {
     display: flex;
-    justify-content: center;
     gap: 10px;
-    margin: 20px 0;
+    flex-wrap: wrap; /* Enable wrapping on all screen sizes */
+    justify-content: center;
 }
 
 .cup {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    cursor: pointer;
-    background-color: #ccc;
+    width: 100px;
+    height: 80px;
+    background-color: #B48A61;
+    position: relative;
+    border: 2px solid #8B5E3C;
+    clip-path: polygon(20% 0%, 80% 0%, 90% 100%, 10% 100%);
+    margin: 0 auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease;
+}
+
+.cup::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 10%;
+    width: 80%;
+    height: 6px;
+    border-radius: 8px 8px 0 0;
+    background-color: #B48A61;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.cup::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 30%;
+    width: 40%;
+    height: 12px;
+    background-color: #B48A61;
+    border-radius: 0 0 10px 10px;
 }
 
 .cup-slot {
-    width: 60px;
-    height: 60px;
-    border: 2px dashed #aaa;
+    width: 100px;
+    height: 130px;
+    background-color: #eee;
+    border: 2px solid #aaa;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.dragging {
-    opacity: 0.5;
-}
-
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    background: #fff;
-    padding: 20px;
-    border-radius: 5px;
-    text-align: center;
+    margin: 0 5px;
     position: relative;
-    width: 80%;
-    max-width: 500px;
+    transition: background-color 0.2s ease;
 }
 
-.close-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 24px;
+.cup-slot:hover {
+    background-color: #ddd;
+}
+
+/* Game Page Styling */
+#level-info {
+    margin: 20px 0;
+}
+
+#level-info span {
+    display: block;
+}
+
+#level-info #level {
+    font-size: 2.5rem;
+}
+
+#level-info #time-left {
+    font-size: 1.5rem;
+}
+
+#level-info #time-left.warning {
+    color: red;
+}
+
+/* Modal Styling */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: whitesmoke;
+    padding: 20px;
+    border: 2px solid black;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 80%;
+    max-width: 400px;
+}
+
+.modal h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.modal p {
+    font-size: 1rem;
+    margin-bottom: 20px;
+}
+
+.modal button {
+    background-color: burlywood;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
     cursor: pointer;
 }
+
+/* Responsive Design for Tablet Devices */
+@media (max-width: 1024px) {
+    h1 {
+        font-size: 50px;
+    }
+
+    button {
+        font-size: 1rem;
+        padding: 10px 20px;
+    }
+
+    .cup {
+        width: 80px;
+        height: 70px;
+    }
+
+    .cup-slot {
+        width: 80px;
+        height: 110px;
+    }
+
+    #level-info #level {
+        font-size: 2rem;
+    }
+}
+
+/* Responsive Design for Mobile Devices */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 40px;
+    }
+
+    button {
+        font-size: 0.9rem;
+        padding: 8px 16px;
+    }
+
+    .cup {
+        width: 70px;
+        height: 60px;
+    }
+
+    .cup-slot {
+        width: 70px;
+        height: 100px;
+    }
+
+    #level-info #level {
+        font-size: 1.8rem;
+    }
+
+    #level-info #time-left {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 32px;
+    }
+
+    button {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+
+    .cup {
+        width: 60px;
+        height: 50px;
+    }
+
+    .cup-slot {
+        width: 60px;
+        height: 90px;
+    }
+
+    #level-info #level {
+        font-size: 1.6rem;
+    }
+
+    #level-info #time-left {
+        font-size: 1rem;
+    }
+}
+
