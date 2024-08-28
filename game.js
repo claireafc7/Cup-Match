@@ -128,6 +128,7 @@ function createCupElement(color) {
 
     // Event listeners for drag and touch actions
     cupElement.addEventListener('dragstart', dragStart);
+    cupElement.addEventListener('dragend', dragEnd); // Added for smooth drag end
     cupElement.addEventListener('click', returnCupToStack);
     addTouchEvents(cupElement);
 
@@ -144,8 +145,12 @@ function addTouchEvents(cupElement) {
 function dragStart(event) {
     if (isPaused) return;
     selectedCupElement = event.target;
-    event.dataTransfer.setData('text/plain', event.target.style.backgroundColor);
-    event.target.style.transform = 'scale(1.1)'; // Scale up for visual feedback
+    selectedCupElement.classList.add('dragging');
+}
+
+function dragEnd(event) {
+    if (isPaused) return;
+    selectedCupElement.classList.remove('dragging');
 }
 
 function dragOver(event) {
@@ -170,7 +175,7 @@ function swapCups(targetSlot) {
     }
 
     targetSlot.appendChild(selectedCupElement);
-    selectedCupElement.style.transform = ''; // Reset scaling
+    selectedCupElement.classList.remove('dragging'); // Remove dragging class
     selectedCupElement = null;
 }
 
@@ -178,7 +183,7 @@ function swapCups(targetSlot) {
 function touchStart(event) {
     if (isPaused) return;
     selectedCupElement = event.target;
-    selectedCupElement.style.transform = 'scale(1.1)'; // Scale up for visual feedback
+    selectedCupElement.classList.add('dragging'); // Visual feedback for touch
 }
 
 function touchMove(event) {
@@ -206,7 +211,7 @@ function resetTouchVariables() {
     if (draggedOverElement) {
         draggedOverElement.classList.remove('highlight');
     }
-    selectedCupElement.style.transform = ''; // Reset scaling
+    selectedCupElement.classList.remove('dragging'); // Remove dragging class
     selectedCupElement = null;
     draggedOverElement = null;
 }
