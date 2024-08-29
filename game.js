@@ -1,7 +1,8 @@
 // Game Configuration and State Variables
 const levels = [
-    { cupCount: 8, timeLimit: 90, extraCups: 4 }, // New levels
-    { cupCount: 8, timeLimit: 90, extraCups: 6 }
+    { cupCount: 3, timeLimit: 60 },
+    { cupCount: 12, timeLimit: 90, extraCups: 4 }, // New levels
+    { cupCount: 14, timeLimit: 90, extraCups: 6 }
 ];
 
 let currentLevel = 0;
@@ -152,15 +153,11 @@ function dragOver(event) {
 function drop(event) {
     event.preventDefault();
     if (isPaused) return;
-    
-    const targetSlot = event.target.closest('.cup-slot');
-    const cupId = selectedCupElement.getAttribute('data-cup-id');
-    const slotId = targetSlot.getAttribute('data-slot-id');
 
-    if (targetSlot && cupId === slotId) { // Check if cup's ID matches the slot's ID
+    const targetSlot = event.target.closest('.cup-slot');
+
+    if (targetSlot && selectedCupElement) {
         swapCups(targetSlot);
-    } else {
-        showModal("Wrong slot! This cup doesn't belong here.");
     }
 }
 
@@ -199,46 +196,39 @@ function touchMove(event) {
 
 function touchEnd(event) {
     if (isPaused) return;
-    document.querySelectorAll('.cup-slot.highlight').forEach(el => el.classList.remove('highlight'));
 
-    if (draggedOverElement) {
-        const slotId = draggedOverElement.getAttribute('data-slot-id');
-        const cupId = selectedCupElement.getAttribute('data-cup-id');
-
-        if (cupId === slotId) { // Check if cup's ID matches the slot's ID
-            swapCups(draggedOverElement);
-        } else {
-            showModal("Wrong slot! This cup doesn't belong here.");
-        }
-        draggedOverElement = null;
+    if (draggedOverElement && draggedOverElement.classList.contains('cup-slot') && selectedCupElement) {
+        swapCups(draggedOverElement); // Swap cups using touch
     }
+    resetTouchVariables();
+}
 
-    selectedCupElement.classList.remove('dragging');
+function resetTouchVariables() {
+    if (draggedOverElement) {
+        draggedOverElement.classList.remove('highlight');
+    }
+    if (selectedCupElement) {
+        selectedCupElement.classList.remove('dragging'); // Remove dragging class
+    }
     selectedCupElement = null;
+    draggedOverElement = null;
+}
+
+function returnCupToStack(event) {
+    if (isPaused) return;
+    document.getElementById('stack-container').appendChild(event.target); // Return cup to stack
 }
 
 function checkArrangement() {
+    if (isPaused) return;
     const slots = document.querySelectorAll('.cup-slot');
-    const currentOrder = [];
-
-    slots.forEach(slot => {
+    const currentOrder = Array.from(slots).map(slot => {
         const cup = slot.querySelector('.cup');
-        if (cup) {
-            const cupId = parseInt(cup.getAttribute('data-cup-id'), 10);
-            currentOrder.push(cupId);
-        } else {
-            currentOrder.push(null); // No cup in this slot
-        }
+        return cup ? parseInt(cup.getAttribute('data-cup-id'), 10) : null;
     });
 
     if (isCorrectArrangement(currentOrder)) {
-        if (currentLevel === levels.length - 1) {
-            showModal('Congratulations! You completed the final level!');
-        } else {
-            currentLevel++;
-            showModal(`Level ${currentLevel} complete! Get ready for the next level.`);
-            startLevel();
-        }
+        handleLevelCompletion();
     } else {
         showModal('Incorrect arrangement! Try again.');
     }
@@ -246,72 +236,89 @@ function checkArrangement() {
 
 function isCorrectArrangement(order) {
     for (let i = 0; i < correctOrder.length; i++) {
-        if (order[i] === null || order[i] !== correctOrder[i].id) {
+        if (order[i] !== correctOrder[i].id) {
             return false;
         }
     }
     return true;
 }
 
-function startTimer(duration) {
+function handleLevelCompletion() {
+    clearInterval(timerInterval);
+
+    if (currentLevel + 1 < levels.length) {
+        showModal('Correct! Moving to the next level.');
+        currentLevel++;
+        startLevel();
+    } else {
+        showModal('Congratulations! You have completed all levels!');
+        endGame();
+    }
+}
+
+function startTimer(seconds) {
     clearInterval(timerInterval); // Clear any previous intervals
-    let timeRemaining = duration;
+    let timeLeft = seconds;
+    const timeLeftElement = document.getElementById('time-left');
+    updateTimeLeft(timeLeft, timeLeftElement);
 
     timerInterval = setInterval(() => {
-        if (isPaused) return;
+        if (!isPaused) {
+            updateTimeLeft(--timeLeft, timeLeftElement);
 
-        timeRemaining--;
-        document.getElementById('time-left').innerText = timeRemaining;
-
-        if (timeRemaining <= 0) {
-            clearInterval(timerInterval);
-            showModal('Time\'s up! Try again.');
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                showModal('Time\'s up! Game over.');
+                endGame();
+            }
         }
     }, 1000);
 }
 
-function endGame() {
-    switchToPage('start-page');
-    clearInterval(timerInterval); // Stop the timer
-}
-
-function togglePause() {
-    isPaused = !isPaused;
-    const pauseButton = document.getElementById('pause-game');
-    pauseButton.innerText = isPaused ? 'Resume' : 'Pause';
-
-    if (isPaused) {
-        clearInterval(timerInterval); // Pause the timer
+function updateTimeLeft(timeLeft, timeLeftElement) {
+    timeLeftElement.innerText = timeLeft;
+    if (timeLeft <= 10) {
+        timeLeftElement.classList.add('warning');
     } else {
-        const timeRemaining = parseInt(document.getElementById('time-left').innerText, 10);
-        startTimer(timeRemaining); // Resume the timer
+        timeLeftElement.classList.remove('warning');
     }
 }
 
-function showInstructions() {
-    showModal(document.getElementById('instructions-modal').innerHTML); // Show modal with instructions
+function togglePause() {
+    if (isPaused) {
+        isPaused = false;
+        document.getElementById('pause-game').innerText = 'Pause Game';
+        const timeLeft = parseInt(document.getElementById('time-left').innerText, 10);
+        startTimer(timeLeft); // Resume timer
+    } else {
+        isPaused = true;
+        document.getElementById('pause-game').innerText = 'Resume Game';
+        clearInterval(timerInterval); // Pause timer
+    }
 }
 
-function returnCupToStack(event) {
-    const cup = event.target;
-    document.getElementById('stack-container').appendChild(cup); // Move cup back to stack
+function endGame() {
+    clearInterval(timerInterval);
+    switchToPage('home-page');
+    currentLevel = 0;
 }
 
-function showModal(modalContent) {
+function switchToPage(pageId) {
+    document.querySelectorAll('.page').forEach(page => page.style.display = 'none');
+    document.getElementById(pageId).style.display = 'block';
+}
+
+function showModal(message) {
     const modal = document.getElementById('modal');
-    modal.querySelector('.modal-content').innerHTML = modalContent;
+    modal.querySelector('p').innerText = message;
     modal.style.display = 'block';
+}
+
+function showInstructions() {
+    const instructionsModal = document.getElementById('instructions-modal');
+    instructionsModal.style.display = 'block';
 }
 
 function closeModal(modal) {
     modal.style.display = 'none';
-}
-
-function switchToPage(pageId) {
-    const pages = document.querySelectorAll('.page');
-    pages.forEach(page => {
-        page.style.display = 'none';
-    });
-
-    document.getElementById(pageId).style.display = 'block';
 }
