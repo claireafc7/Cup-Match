@@ -1,5 +1,6 @@
 // Game Configuration and State Variables
 const levels = [
+    { cupCount: 3, timeLimit: 60 },
     { cupCount: 12, timeLimit: 75, duplicateColors: 12 },
     { cupCount: 12, timeLimit: 90, extraCups: 4 },
     { cupCount: 14, timeLimit: 90, extraCups: 6 }
@@ -238,7 +239,7 @@ function getArrangedCups() {
 function calculateCorrectCups(arrangedCups) {
     return arrangedCups.reduce((count, cup, index) => {
         const correctCup = correctOrder[index];
-        return count + (cup && correctCup && cup.color === correctCup.color && cup.id === correctCup.id ? 1 : 0);
+        return count + (cup && correctCup && cup.color === correctCup.color && cup.id == correctCup.id ? 1 : 0);
     }, 0);
 }
 
