@@ -2,8 +2,8 @@
 const levels = [
     { cupCount: 3, timeLimit: 60 },
     { cupCount: 12, timeLimit: 75, duplicateColors: 12 },
-    { cupCount: 12, timeLimit: 90, extraCups: 4 }, // New levels
-    { cupCount: 14, timeLimit: 90, extraCups: 6 }
+    { cupCount: 8, timeLimit: 90, extraCups: 4 }, // New levels
+    { cupCount: 8, timeLimit: 90, extraCups: 6 }
 ];
 
 let currentLevel = 0;
@@ -199,23 +199,24 @@ function touchMove(event) {
     }
 }
 
-function touchEnd() {
+function touchEnd(event) {
     if (isPaused) return;
-    if (draggedOverElement && draggedOverElement.classList.contains('cup-slot') && selectedCupElement) {
-        swapCups(draggedOverElement); // Swap cups using touch
-    }
-    resetTouchVariables();
-}
+    document.querySelectorAll('.cup-slot.highlight').forEach(el => el.classList.remove('highlight'));
 
-function resetTouchVariables() {
     if (draggedOverElement) {
-        draggedOverElement.classList.remove('highlight');
+        const slotId = draggedOverElement.getAttribute('data-slot-id');
+        const cupId = selectedCupElement.getAttribute('data-cup-id');
+
+        if (cupId === slotId) { // Check if cup's ID matches the slot's ID
+            swapCups(draggedOverElement);
+        } else {
+            showModal("Wrong slot! This cup doesn't belong here.");
+        }
+        draggedOverElement = null;
     }
-    if (selectedCupElement) {
-        selectedCupElement.classList.remove('dragging'); // Remove dragging class
-    }
+
+    selectedCupElement.classList.remove('dragging');
     selectedCupElement = null;
-    draggedOverElement = null;
 }
 
 function checkArrangement() {
@@ -290,7 +291,7 @@ function togglePause() {
 }
 
 function showInstructions() {
-    showModal(document.getElementById('instructions-modal'));
+    showModal(document.getElementById('instructions-modal').innerHTML); // Show modal with instructions
 }
 
 function returnCupToStack(event) {
