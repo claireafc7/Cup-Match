@@ -125,7 +125,7 @@ function createCupElement(color, id) {
 
     // Event listeners for drag and touch actions
     cupElement.addEventListener('dragstart', dragStart);
-    cupElement.addEventListener('dragend', dragEnd); 
+    cupElement.addEventListener('dragend', dragEnd);
     cupElement.addEventListener('click', returnCupToStack);
     addTouchEvents(cupElement);
 
