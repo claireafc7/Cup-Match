@@ -120,7 +120,7 @@ function createCupElement(color, id) {
 
     // Event listeners for drag and touch actions
     cupElement.addEventListener('dragstart', dragStart);
-    cupElement.addEventListener('dragend', dragEnd);
+    cupElement.addEventListener('dragend', dragEnd); 
     cupElement.addEventListener('click', returnCupToStack);
     addTouchEvents(cupElement);
 
@@ -238,14 +238,12 @@ function getArrangedCups() {
 
 function calculateCorrectCups(arrangedCups) {
     let correctCount = 0;
-    const usedIndexes = new Set(); // Track used indexes for duplicate checking
 
-    arrangedCups.forEach(cup => {
+    arrangedCups.forEach((cup, index) => {
         if (cup) {
-            const correctCup = correctOrder.find(c => c.color === cup.color && c.id === cup.id);
-            if (correctCup && !usedIndexes.has(correctCup.id)) {
+            const correctCup = correctOrder[index];
+            if (correctCup && cup.color === correctCup.color && cup.id === correctCup.id) {
                 correctCount++;
-                usedIndexes.add(correctCup.id);
             }
         }
     });
