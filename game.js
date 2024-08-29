@@ -1,7 +1,7 @@
 // Game Configuration and State Variables
 const levels = [
     { cupCount: 3, timeLimit: 60 },
-    { cupCount: 12, timeLimit: 75, duplicateColors: 10 },
+    { cupCount: 12, timeLimit: 75, duplicateColors: 12 },
     { cupCount: 12, timeLimit: 90, extraCups: 4 },
     { cupCount: 14, timeLimit: 90, extraCups: 6 }
 ];
@@ -237,10 +237,18 @@ function getArrangedCups() {
 }
 
 function calculateCorrectCups(arrangedCups) {
-    return arrangedCups.reduce((count, cup, index) => {
-        const correctCup = correctOrder[index];
-        return count + (cup && correctCup && cup.color === correctCup.color && cup.id == correctCup.id ? 1 : 0);
-    }, 0);
+    let correctCount = 0;
+    const usedIndexes = new Set(); // Track used indexes for duplicate checking
+
+    arrangedCups.forEach((cup, index) => {
+        const correctCup = correctOrder.find(c => c.color === cup.color && c.id === cup.id);
+        if (correctCup && !usedIndexes.has(correctCup.id)) {
+            correctCount++;
+            usedIndexes.add(correctCup.id);
+        }
+    });
+
+    return correctCount;
 }
 
 function handleLevelCompletion() {
