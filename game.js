@@ -1,8 +1,8 @@
 // Game Configuration and State Variables
 const levels = [
     { cupCount: 3, timeLimit: 60 },
-    { cupCount: 12, timeLimit: 90, extraCups: 4 }, // New levels
-    { cupCount: 14, timeLimit: 90, extraCups: 6 }
+    { cupCount: 8, timeLimit: 90, extraCups: 4 }, // New levels
+    { cupCount: 8, timeLimit: 90, extraCups: 6 }
 ];
 
 let currentLevel = 0;
@@ -227,20 +227,20 @@ function checkArrangement() {
         return cup ? parseInt(cup.getAttribute('data-cup-id'), 10) : null;
     });
 
-    if (isCorrectArrangement(currentOrder)) {
-        handleLevelCompletion();
-    } else {
-        showModal('Incorrect arrangement! Try again.');
-    }
+    const correctCount = calculateCorrectCups(currentOrder);
+
+    // Show message indicating correct cups out of total
+    showModal(`${correctCount} out of ${correctOrder.length} cups are correct. Try again!`);
 }
 
-function isCorrectArrangement(order) {
+function calculateCorrectCups(order) {
+    let correctCount = 0;
     for (let i = 0; i < correctOrder.length; i++) {
-        if (order[i] !== correctOrder[i].id) {
-            return false;
+        if (order[i] !== null && order[i] === correctOrder[i].id) {
+            correctCount++;
         }
     }
-    return true;
+    return correctCount;
 }
 
 function handleLevelCompletion() {
