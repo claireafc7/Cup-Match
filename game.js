@@ -1,6 +1,8 @@
+// Game Configuration and State Variables
 const levels = [
     { cupCount: 3, timeLimit: 60 },
-    { cupCount: 12, timeLimit: 75, duplicateColors: 6 },
+    { cupCount: 12, timeLimit: 75, duplicateColors: 8 },
+    { cupCount: 12, timeLimit: 75, duplicateColors: 12 },
     { cupCount: 12, timeLimit: 90, extraCups: 4 },
     { cupCount: 14, timeLimit: 90, extraCups: 6 }
 ];
@@ -55,7 +57,7 @@ function startLevel() {
 }
 
 function updateLevelInfo(levelData) {
-    document.getElementById('level').innerText = Level ${currentLevel + 1};
+    document.getElementById('level').innerText = `Level ${currentLevel + 1}`;
     document.getElementById('time-left').innerText = levelData.timeLimit;
 }
 
@@ -68,7 +70,7 @@ function generateCups(totalCupCount, actualCupCount, duplicateColors = 0) {
         selectedColors.push(selectedColors[Math.floor(Math.random() * selectedColors.length)]);
     }
 
-    // Generate cups with colors
+    // Generate cups with colors and unique IDs
     const cups = [];
     for (let i = 0; i < totalCupCount; i++) {
         cups.push({ color: selectedColors[i % selectedColors.length], id: i });
@@ -224,22 +226,29 @@ function checkArrangement() {
     if (correctCount === correctOrder.length) {
         handleLevelCompletion();
     } else {
-        showModal(${correctCount} out of ${correctOrder.length} cups are correct. Try again!);
+        showModal(`${correctCount} out of ${correctOrder.length} cups are correct. Try again!`);
     }
 }
 
 function getArrangedCups() {
     return [...document.getElementById('arrangement-container').children].map(slot => {
         const cup = slot.querySelector('.cup');
-        return cup ? cup.style.backgroundColor : null;
+        return cup ? { color: cup.style.backgroundColor, id: parseInt(cup.getAttribute('data-cup-id')) } : null;
     });
 }
 
 function calculateCorrectCups(arrangedCups) {
-    return arrangedCups.reduce((count, color, index) => {
-        const cupId = document.querySelector([data-cup-id="${index}"])?.style.backgroundColor;
-        return count + (color === cupId ? 1 : 0);
-    }, 0);
+    let correctCount = 0;
+    arrangedCups.forEach((arrangedCup, index) => {
+        const correctCup = correctOrder[index];
+        if (arrangedCup && correctCup) {
+            if (arrangedCup.color === correctCup.color && arrangedCup.id === correctCup.id) {
+                correctCount++;
+            }
+        }
+    });
+
+    return correctCount;
 }
 
 function handleLevelCompletion() {
@@ -318,4 +327,4 @@ function showInstructions() {
 
 function closeModal(modal) {
     modal.style.display = 'none';
-} 
+}
