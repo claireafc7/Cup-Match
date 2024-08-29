@@ -1,8 +1,9 @@
 // Game Configuration and State Variables
 const levels = [
     { cupCount: 3, timeLimit: 60 },
-    { cupCount: 8, timeLimit: 90, extraCups: 4 }, // New levels
-    { cupCount: 8, timeLimit: 90, extraCups: 6 }
+    { cupCount: 12, timeLimit: 75, duplicateColors: 12 },
+    { cupCount: 12, timeLimit: 90, extraCups: 4 },
+    { cupCount: 14, timeLimit: 90, extraCups: 6 }
 ];
 
 let currentLevel = 0;
@@ -44,12 +45,12 @@ function startLevel() {
     const levelData = levels[currentLevel];
     updateLevelInfo(levelData);
 
-    const totalCups = levelData.cupCount + (levelData.extraCups || 0); // Total cups including extra ones
-    shuffledCups = generateCups(totalCups, levelData.cupCount, levelData.duplicateColors || 0); // Generate cups with unique IDs
-    correctOrder = shuffledCups.slice(0, levelData.cupCount); // Correct order only includes the actual cup count
+    const totalCups = levelData.cupCount + (levelData.extraCups || 0);
+    shuffledCups = generateCups(totalCups, levelData.cupCount, levelData.duplicateColors || 0);
+    correctOrder = shuffledCups.slice(0, levelData.cupCount); // First N cups are the correct order
 
     displayCupsInStack(shuffledCups);
-    createCupSlots(levelData.cupCount);
+    createCupSlots(levelData.cupCount); // Create slots based on the cup count
 
     startTimer(levelData.timeLimit);
 }
@@ -68,9 +69,10 @@ function generateCups(totalCupCount, actualCupCount, duplicateColors = 0) {
         selectedColors.push(selectedColors[Math.floor(Math.random() * selectedColors.length)]);
     }
 
-    let cups = [];
+    // Generate cups with colors
+    const cups = [];
     for (let i = 0; i < totalCupCount; i++) {
-        cups.push({ color: selectedColors[i % selectedColors.length], id: i }); // Assign unique ID to each cup
+        cups.push({ color: selectedColors[i % selectedColors.length], id: i });
     }
 
     return shuffleArray(cups);
@@ -90,16 +92,35 @@ function displayCupsInStack(cups) {
     });
 }
 
+function createCupSlots(count) {
+    const arrangementContainer = document.getElementById('arrangement-container');
+    arrangementContainer.innerHTML = ''; // Clear previous slots
+
+    for (let i = 0; i < count; i++) {
+        const slotElement = createCupSlotElement(i);
+        arrangementContainer.appendChild(slotElement);
+    }
+}
+
+function createCupSlotElement(index) {
+    const slotElement = document.createElement('div');
+    slotElement.className = 'cup-slot';
+    slotElement.setAttribute('data-index', index);
+    slotElement.addEventListener('dragover', dragOver);
+    slotElement.addEventListener('drop', drop);
+    return slotElement;
+}
+
 function createCupElement(color, id) {
     const cupElement = document.createElement('div');
     cupElement.className = 'cup';
     cupElement.style.backgroundColor = color;
     cupElement.setAttribute('draggable', true);
-    cupElement.setAttribute('data-cup-id', id); // Assign the unique ID to the cup element
+    cupElement.setAttribute('data-cup-id', id); // Unique ID for each cup
 
     // Event listeners for drag and touch actions
     cupElement.addEventListener('dragstart', dragStart);
-    cupElement.addEventListener('dragend', dragEnd); // Added for smooth drag end
+    cupElement.addEventListener('dragend', dragEnd); 
     cupElement.addEventListener('click', returnCupToStack);
     addTouchEvents(cupElement);
 
@@ -110,27 +131,6 @@ function addTouchEvents(cupElement) {
     cupElement.addEventListener('touchstart', touchStart, { passive: false });
     cupElement.addEventListener('touchmove', touchMove, { passive: false });
     cupElement.addEventListener('touchend', touchEnd);
-}
-
-function createCupSlots(count) {
-    const arrangementContainer = document.getElementById('arrangement-container');
-    arrangementContainer.innerHTML = ''; // Clear previous slots
-
-    // Create slots only for the correct number of cups (no extra slots)
-    for (let i = 0; i < count; i++) {
-        const slotElement = createCupSlotElement(i);
-        arrangementContainer.appendChild(slotElement);
-    }
-}
-
-function createCupSlotElement(index) {
-    const slotElement = document.createElement('div');
-    slotElement.className = 'cup-slot';
-    slotElement.setAttribute('data-slot-id', index); // Assign the unique ID to the slot element
-
-    slotElement.addEventListener('dragover', dragOver);
-    slotElement.addEventListener('drop', drop);
-    return slotElement;
 }
 
 // Drag and Drop Functions for Desktop
@@ -153,7 +153,6 @@ function dragOver(event) {
 function drop(event) {
     event.preventDefault();
     if (isPaused) return;
-
     const targetSlot = event.target.closest('.cup-slot');
 
     if (targetSlot && selectedCupElement) {
@@ -194,9 +193,8 @@ function touchMove(event) {
     }
 }
 
-function touchEnd(event) {
+function touchEnd() {
     if (isPaused) return;
-
     if (draggedOverElement && draggedOverElement.classList.contains('cup-slot') && selectedCupElement) {
         swapCups(draggedOverElement); // Swap cups using touch
     }
@@ -221,31 +219,28 @@ function returnCupToStack(event) {
 
 function checkArrangement() {
     if (isPaused) return;
-
-    const slots = document.querySelectorAll('.cup-slot');
-    const currentOrder = Array.from(slots).map(slot => {
-        const cup = slot.querySelector('.cup');
-        return cup ? parseInt(cup.getAttribute('data-cup-id'), 10) : null;
-    });
-
-    const correctCount = calculateCorrectCups(currentOrder);
-
-    // Show message indicating correct cups out of total
-    showModal(`${correctCount} out of ${correctOrder.length} cups are correct. ${correctCount === correctOrder.length ? 'Level complete!' : 'Try again!'}`);
+    const arrangedCups = getArrangedCups();
+    const correctCount = calculateCorrectCups(arrangedCups);
 
     if (correctCount === correctOrder.length) {
         handleLevelCompletion();
+    } else {
+        showModal(`${correctCount} out of ${correctOrder.length} cups are correct. Try again!`);
     }
 }
 
-function calculateCorrectCups(order) {
-    let correctCount = 0;
-    for (let i = 0; i < correctOrder.length; i++) {
-        if (order[i] !== null && order[i] === correctOrder[i].id) {
-            correctCount++;
-        }
-    }
-    return correctCount;
+function getArrangedCups() {
+    return [...document.getElementById('arrangement-container').children].map(slot => {
+        const cup = slot.querySelector('.cup');
+        return cup ? cup.style.backgroundColor : null;
+    });
+}
+
+function calculateCorrectCups(arrangedCups) {
+    return arrangedCups.reduce((count, color, index) => {
+        const cupId = document.querySelector(`[data-cup-id="${index}"]`)?.style.backgroundColor;
+        return count + (color === cupId ? 1 : 0);
+    }, 0);
 }
 
 function handleLevelCompletion() {
@@ -262,7 +257,6 @@ function handleLevelCompletion() {
 }
 
 function startTimer(seconds) {
-    clearInterval(timerInterval); // Clear any previous intervals
     let timeLeft = seconds;
     const timeLeftElement = document.getElementById('time-left');
     updateTimeLeft(timeLeft, timeLeftElement);
@@ -293,8 +287,7 @@ function togglePause() {
     if (isPaused) {
         isPaused = false;
         document.getElementById('pause-game').innerText = 'Pause Game';
-        const timeLeft = parseInt(document.getElementById('time-left').innerText, 10);
-        startTimer(timeLeft); // Resume timer
+        startTimer(parseInt(document.getElementById('time-left').innerText)); // Resume timer
     } else {
         isPaused = true;
         document.getElementById('pause-game').innerText = 'Resume Game';
