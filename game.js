@@ -1,8 +1,24 @@
 // Game Configuration and State Variables
 const levels = [
-    { cupCount: 3, timeLimit: 60 },,
-    { cupCount: 12, timeLimit: 90, extraCups: 4 },
-    { cupCount: 14, timeLimit: 90, extraCups: 6 }
+    { cupCount: 3, timeLimit: 60 },
+    { cupCount: 3, timeLimit: 45 },
+    { cupCount: 3, timeLimit: 30 },
+    { cupCount: 4, timeLimit: 60 },
+    { cupCount: 4, timeLimit: 45 },
+    { cupCount: 5, timeLimit: 60 },
+    { cupCount: 5, timeLimit: 45 },
+    { cupCount: 6, timeLimit: 60 },
+    { cupCount: 7, timeLimit: 60 },
+    { cupCount: 8, timeLimit: 60 },
+    { cupCount: 9, timeLimit: 60 },
+    { cupCount: 10, timeLimit: 60 },
+    { cupCount: 10, timeLimit: 75, duplicateColors: 2 },
+    { cupCount: 10, timeLimit: 75, duplicateColors: 4 },
+    { cupCount: 12, timeLimit: 75, duplicateColors: 6 },
+    { cupCount: 12, timeLimit: 75, duplicateColors: 2 },
+    { cupCount: 12, timeLimit: 75, duplicateColors: 14 },
+    { cupCount: 10, timeLimit: 90, extraCups: 4 },
+    { cupCount: 10, timeLimit: 90, extraCups: 6 }
 ];
 
 let currentLevel = 0;
