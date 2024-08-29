@@ -245,8 +245,8 @@ function calculateCorrectCups(arrangedCups) {
 function handleLevelCompletion() {
     clearInterval(timerInterval);
     showModal('Congratulations! You completed the level.');
-    // Move to the next level or restart
     currentLevel = (currentLevel + 1) % levels.length;
+    startLevel(); // Start the next level
 }
 
 function startTimer(duration) {
