@@ -120,7 +120,7 @@ function createCupElement(color, id) {
 
     // Event listeners for drag and touch actions
     cupElement.addEventListener('dragstart', dragStart);
-    cupElement.addEventListener('dragend', dragEnd); 
+    cupElement.addEventListener('dragend', dragEnd);
     cupElement.addEventListener('click', returnCupToStack);
     addTouchEvents(cupElement);
 
@@ -232,7 +232,7 @@ function checkArrangement() {
 function getArrangedCups() {
     return [...document.getElementById('arrangement-container').children].map(slot => {
         const cup = slot.querySelector('.cup');
-        return cup ? { color: cup.style.backgroundColor, id: cup.getAttribute('data-cup-id') } : null;
+        return cup ? { color: cup.style.backgroundColor, id: parseInt(cup.getAttribute('data-cup-id'), 10) } : null;
     });
 }
 
@@ -240,11 +240,13 @@ function calculateCorrectCups(arrangedCups) {
     let correctCount = 0;
     const usedIndexes = new Set(); // Track used indexes for duplicate checking
 
-    arrangedCups.forEach((cup, index) => {
-        const correctCup = correctOrder.find(c => c.color === cup.color && c.id === cup.id);
-        if (correctCup && !usedIndexes.has(correctCup.id)) {
-            correctCount++;
-            usedIndexes.add(correctCup.id);
+    arrangedCups.forEach(cup => {
+        if (cup) {
+            const correctCup = correctOrder.find(c => c.color === cup.color && c.id === cup.id);
+            if (correctCup && !usedIndexes.has(correctCup.id)) {
+                correctCount++;
+                usedIndexes.add(correctCup.id);
+            }
         }
     });
 
