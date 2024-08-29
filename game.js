@@ -18,7 +18,8 @@ const levels = [
     { cupCount: 12, timeLimit: 75, duplicateColors: 2 },
     { cupCount: 12, timeLimit: 75, duplicateColors: 14 },
     { cupCount: 10, timeLimit: 90, extraCups: 4 },
-    { cupCount: 10, timeLimit: 90, extraCups: 6 }
+    { cupCount: 10, timeLimit: 90, extraCups: 6 },
+    { cupCount: 12, timeLimit: 90, extraCups: 4 }
 ];
 
 let currentLevel = 0;
@@ -76,7 +77,7 @@ function updateLevelInfo(levelData) {
 }
 
 function generateCups(totalCupCount, actualCupCount, duplicateColors = 0) {
-    const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown', 'beige', 'teal'];
+    const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown', 'beige', 'teal', 'black', 'white', 'cyan', 'lilac', 'burlywood', 'gold', 'grey'];
     let selectedColors = colors.slice(0, actualCupCount - duplicateColors);
 
     // Add duplicate colors
