@@ -62,10 +62,10 @@ function startLevel() {
 
     const totalCups = levelData.cupCount + (levelData.extraCups || 0);
     shuffledCups = generateCups(totalCups, levelData.duplicateColors || 0);
-    correctOrder = [...shuffledCups].sort(() => Math.random() - 0.5);
+    correctOrder = [...shuffledCups].slice(0, levelData.cupCount); // Only consider the correct number of cups
 
     displayCupsInStack(shuffledCups);
-    createCupSlots(levelData.cupCount);
+    createCupSlots(levelData.cupCount, levelData.extraCups || 0);
 
     startTimer(levelData.timeLimit);
 }
@@ -101,20 +101,33 @@ function displayCupsInStack(cups) {
     });
 }
 
-function createCupSlots(count) {
+function createCupSlots(correctCount, extraCount) {
     const arrangementContainer = document.getElementById('arrangement-container');
     arrangementContainer.innerHTML = ''; // Clear previous slots
 
-    for (let i = 0; i < count; i++) {
-        const slotElement = createCupSlotElement(i);
+    // Create slots for the correct cups
+    for (let i = 0; i < correctCount; i++) {
+        const slotElement = createCupSlotElement(i, false); // false -> not an extra slot
         arrangementContainer.appendChild(slotElement);
+    }
+
+    // Create extra slots that won't be checked
+    for (let i = 0; i < extraCount; i++) {
+        const extraSlotElement = createCupSlotElement(i + correctCount, true); // true -> extra slot
+        arrangementContainer.appendChild(extraSlotElement);
     }
 }
 
-function createCupSlotElement(index) {
+function createCupSlotElement(index, isExtraSlot) {
     const slotElement = document.createElement('div');
     slotElement.className = 'cup-slot';
     slotElement.setAttribute('data-index', index);
+
+    // Mark extra slots with a different class if needed
+    if (isExtraSlot) {
+        slotElement.classList.add('extra-slot');
+    }
+
     slotElement.addEventListener('dragover', dragOver);
     slotElement.addEventListener('drop', drop);
     return slotElement;
@@ -238,7 +251,8 @@ function checkArrangement() {
 }
 
 function getArrangedCups() {
-    return [...document.getElementById('arrangement-container').children].map(slot => {
+    // Only get cups from non-extra slots
+    return [...document.querySelectorAll('#arrangement-container .cup-slot:not(.extra-slot)')].map(slot => {
         const cup = slot.querySelector('.cup');
         return cup ? cup.style.backgroundColor : null;
     });
