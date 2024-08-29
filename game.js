@@ -1,8 +1,8 @@
 // Game Configuration and State Variables
 const levels = [
     { cupCount: 3, timeLimit: 60 },
-    { cupCount: 12, timeLimit: 75, duplicateColors: 11 },
-    { cupCount: 12, timeLimit: 90, extraCups: 4 }, // New levels
+    { cupCount: 12, timeLimit: 75, duplicateColors: 10 },
+    { cupCount: 12, timeLimit: 90, extraCups: 2 }, // Updated level with 2 extra cups
     { cupCount: 14, timeLimit: 90, extraCups: 6 }
 ];
 
@@ -45,12 +45,12 @@ function startLevel() {
     const levelData = levels[currentLevel];
     updateLevelInfo(levelData);
 
-    const totalCups = levelData.cupCount + (levelData.extraCups || 0);
-    shuffledCups = generateCups(totalCups, levelData.duplicateColors || 0);
-    correctOrder = [...shuffledCups].slice(0, levelData.cupCount); // Only consider the correct number of cups
+    const totalCups = levelData.cupCount + (levelData.extraCups || 0); // Total cups including extra ones
+    shuffledCups = generateCups(totalCups, levelData.duplicateColors || 0); // Shuffle all cups
+    correctOrder = shuffledCups.slice(0, levelData.cupCount); // Correct order only includes the actual cup count
 
     displayCupsInStack(shuffledCups);
-    createCupSlots(levelData.cupCount, levelData.extraCups || 0);
+    createCupSlots(levelData.cupCount);
 
     startTimer(levelData.timeLimit);
 }
@@ -61,7 +61,7 @@ function updateLevelInfo(levelData) {
 }
 
 function generateCups(count, duplicateColors = 0) {
-    const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown', 'beige', 'teal', 'black', 'grey', 'gold', 'white'];
+    const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown', 'beige', 'teal'];
     let selectedColors = colors.slice(0, count - duplicateColors);
 
     // Add duplicate colors
@@ -86,32 +86,21 @@ function displayCupsInStack(cups) {
     });
 }
 
-function createCupSlots(correctCount, extraCount) {
+function createCupSlots(count) {
     const arrangementContainer = document.getElementById('arrangement-container');
     arrangementContainer.innerHTML = ''; // Clear previous slots
 
-    // Create slots for the correct cups
-    for (let i = 0; i < correctCount; i++) {
-        const slotElement = createCupSlotElement(i, false); // false -> not an extra slot
+    // Create slots only for the correct number of cups (no extra slots)
+    for (let i = 0; i < count; i++) {
+        const slotElement = createCupSlotElement(i);
         arrangementContainer.appendChild(slotElement);
-    }
-
-    // Create extra slots that won't be checked
-    for (let i = 0; i < extraCount; i++) {
-        const extraSlotElement = createCupSlotElement(i + correctCount, true); // true -> extra slot
-        arrangementContainer.appendChild(extraSlotElement);
     }
 }
 
-function createCupSlotElement(index, isExtraSlot) {
+function createCupSlotElement(index) {
     const slotElement = document.createElement('div');
     slotElement.className = 'cup-slot';
     slotElement.setAttribute('data-index', index);
-
-    // Mark extra slots with a different class if needed
-    if (isExtraSlot) {
-        slotElement.classList.add('extra-slot');
-    }
 
     slotElement.addEventListener('dragover', dragOver);
     slotElement.addEventListener('drop', drop);
@@ -236,8 +225,8 @@ function checkArrangement() {
 }
 
 function getArrangedCups() {
-    // Only get cups from non-extra slots
-    return [...document.querySelectorAll('#arrangement-container .cup-slot:not(.extra-slot)')].map(slot => {
+    // Get cups from the actual slots (ignoring extra cups)
+    return [...document.querySelectorAll('#arrangement-container .cup-slot')].map(slot => {
         const cup = slot.querySelector('.cup');
         return cup ? cup.style.backgroundColor : null;
     });
