@@ -232,17 +232,16 @@ function checkArrangement() {
 function getArrangedCups() {
     return [...document.getElementById('arrangement-container').children].map(slot => {
         const cup = slot.querySelector('.cup');
-        return cup ? { color: cup.style.backgroundColor, id: parseInt(cup.getAttribute('data-cup-id'), 10) } : null;
+        return cup ? { color: cup.style.backgroundColor, id: parseInt(cup.getAttribute('data-cup-id')) } : null;
     });
 }
 
 function calculateCorrectCups(arrangedCups) {
     let correctCount = 0;
-
-    arrangedCups.forEach((cup, index) => {
-        if (cup) {
-            const correctCup = correctOrder[index];
-            if (correctCup && cup.color === correctCup.color && cup.id === correctCup.id) {
+    arrangedCups.forEach((arrangedCup, index) => {
+        const correctCup = correctOrder[index];
+        if (arrangedCup && correctCup) {
+            if (arrangedCup.color === correctCup.color && arrangedCup.id === correctCup.id) {
                 correctCount++;
             }
         }
