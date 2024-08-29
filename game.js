@@ -1,5 +1,6 @@
 // Game Configuration and State Variables
 const levels = [
+    { cupCount: 3, timeLimit: 60 },
     { cupCount: 12, timeLimit: 75, duplicateColors: 12 },
     { cupCount: 12, timeLimit: 90, extraCups: 4 },
     { cupCount: 14, timeLimit: 90, extraCups: 6 }
@@ -49,7 +50,7 @@ function startLevel() {
     correctOrder = shuffledCups.slice(0, levelData.cupCount); // First N cups are the correct order
 
     displayCupsInStack(shuffledCups);
-    createCupSlots(levelData.cupCount);
+    createCupSlots(levelData.cupCount); // Create slots based on the cup count
 
     startTimer(levelData.timeLimit);
 }
@@ -68,7 +69,7 @@ function generateCups(totalCupCount, actualCupCount, duplicateColors = 0) {
         selectedColors.push(selectedColors[Math.floor(Math.random() * selectedColors.length)]);
     }
 
-    // Generate cups with unique IDs
+    // Generate cups with colors and unique IDs
     const cups = [];
     for (let i = 0; i < totalCupCount; i++) {
         cups.push({ color: selectedColors[i % selectedColors.length], id: i });
@@ -119,7 +120,7 @@ function createCupElement(color, id) {
 
     // Event listeners for drag and touch actions
     cupElement.addEventListener('dragstart', dragStart);
-    cupElement.addEventListener('dragend', dragEnd);
+    cupElement.addEventListener('dragend', dragEnd); 
     cupElement.addEventListener('click', returnCupToStack);
     addTouchEvents(cupElement);
 
@@ -244,52 +245,78 @@ function calculateCorrectCups(arrangedCups) {
 
 function handleLevelCompletion() {
     clearInterval(timerInterval);
-    showModal('Congratulations! You completed the level.');
-    currentLevel = (currentLevel + 1) % levels.length;
-    startLevel(); // Start the next level
+
+    if (currentLevel + 1 < levels.length) {
+        showModal('Correct! Moving to the next level.');
+        currentLevel++;
+        startLevel();
+    } else {
+        showModal('Congratulations! You have completed all levels!');
+        endGame();
+    }
 }
 
-function startTimer(duration) {
-    let timer = duration;
-    document.getElementById('time-left').innerText = timer;
+function startTimer(seconds) {
+    let timeLeft = seconds;
+    const timeLeftElement = document.getElementById('time-left');
+    updateTimeLeft(timeLeft, timeLeftElement);
+
     timerInterval = setInterval(() => {
-        if (timer <= 0) {
-            clearInterval(timerInterval);
-            showModal('Time is up! Try again.');
-        } else {
-            timer -= 1;
-            document.getElementById('time-left').innerText = timer;
+        if (!isPaused) {
+            updateTimeLeft(--timeLeft, timeLeftElement);
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                showModal('Time\'s up! Game over.');
+                endGame();
+            }
         }
     }, 1000);
 }
 
+function updateTimeLeft(timeLeft, timeLeftElement) {
+    timeLeftElement.innerText = timeLeft;
+    if (timeLeft <= 10) {
+        timeLeftElement.classList.add('warning');
+    } else {
+        timeLeftElement.classList.remove('warning');
+    }
+}
+
 function togglePause() {
-    isPaused = !isPaused;
-    document.getElementById('pause-game').innerText = isPaused ? 'Resume' : 'Pause';
-}
-
-function showInstructions() {
-    document.getElementById('instructions-modal').style.display = 'block';
-}
-
-function closeModal(modal) {
-    modal.style.display = 'none';
-}
-
-function showModal(message) {
-    const modal = document.getElementById('modal');
-    modal.querySelector('.modal-message').innerText = message;
-    modal.style.display = 'block';
+    if (isPaused) {
+        isPaused = false;
+        document.getElementById('pause-game').innerText = 'Pause Game';
+        startTimer(parseInt(document.getElementById('time-left').innerText)); // Resume timer
+    } else {
+        isPaused = true;
+        document.getElementById('pause-game').innerText = 'Resume Game';
+        clearInterval(timerInterval); // Pause timer
+    }
 }
 
 function endGame() {
     clearInterval(timerInterval);
     switchToPage('home-page');
+    currentLevel = 0;
 }
 
 function switchToPage(pageId) {
-    document.querySelectorAll('.page').forEach(page => {
-        page.style.display = 'none';
-    });
+    document.querySelectorAll('.page').forEach(page => page.style.display = 'none');
     document.getElementById(pageId).style.display = 'block';
+}
+
+function showModal(message) {
+    const modal = document.getElementById('modal');
+    modal.querySelector('p').innerText = message;
+    modal.style.display = 'block';
+}
+
+function showInstructions() {
+    const instructionsModal = document.getElementById('instructions-modal');
+    instructionsModal.style.display = 'block';
+}
+
+function closeModal(modal) {
+    modal.style.display = 'none';
 }
