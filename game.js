@@ -1,22 +1,6 @@
 // Game Configuration and State Variables
 const levels = [
-    { cupCount: 3, timeLimit: 60 },
-    { cupCount: 3, timeLimit: 45 },
-    { cupCount: 3, timeLimit: 30 },
-    { cupCount: 4, timeLimit: 60 },
-    { cupCount: 4, timeLimit: 45 },
-    { cupCount: 5, timeLimit: 60 },
-    { cupCount: 5, timeLimit: 45 },
-    { cupCount: 6, timeLimit: 60 },
-    { cupCount: 7, timeLimit: 60 },
-    { cupCount: 8, timeLimit: 60 },
-    { cupCount: 9, timeLimit: 60 },
-    { cupCount: 10, timeLimit: 60 },
-    { cupCount: 10, timeLimit: 75, duplicateColors: 4 },
-    { cupCount: 10, timeLimit: 75, duplicateColors: 8 },
-    { cupCount: 12, timeLimit: 75, duplicateColors: 4 },
-    { cupCount: 12, timeLimit: 75, duplicateColors: 6 },
-    { cupCount: 12, timeLimit: 75, duplicateColors: 8 },
+    { cupCount: 3, timeLimit: 60 },,
     { cupCount: 12, timeLimit: 90, extraCups: 4 },
     { cupCount: 14, timeLimit: 90, extraCups: 6 }
 ];
@@ -71,7 +55,7 @@ function startLevel() {
 }
 
 function updateLevelInfo(levelData) {
-    document.getElementById('level').innerText = Level ${currentLevel + 1};
+    document.getElementById('level').innerText = `Level ${currentLevel + 1}`;
     document.getElementById('time-left').innerText = levelData.timeLimit;
 }
 
@@ -240,7 +224,7 @@ function checkArrangement() {
     if (correctCount === correctOrder.length) {
         handleLevelCompletion();
     } else {
-        showModal(${correctCount} out of ${correctOrder.length} cups are correct. Try again!);
+        showModal(`${correctCount} out of ${correctOrder.length} cups are correct. Try again!`);
     }
 }
 
@@ -253,7 +237,7 @@ function getArrangedCups() {
 
 function calculateCorrectCups(arrangedCups) {
     return arrangedCups.reduce((count, color, index) => {
-        const cupId = document.querySelector([data-cup-id="${index}"])?.style.backgroundColor;
+        const cupId = document.querySelector(`[data-cup-id="${index}"]`)?.style.backgroundColor;
         return count + (color === cupId ? 1 : 0);
     }, 0);
 }
@@ -334,4 +318,4 @@ function showInstructions() {
 
 function closeModal(modal) {
     modal.style.display = 'none';
-} 
+}
