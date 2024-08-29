@@ -221,6 +221,7 @@ function returnCupToStack(event) {
 
 function checkArrangement() {
     if (isPaused) return;
+
     const slots = document.querySelectorAll('.cup-slot');
     const currentOrder = Array.from(slots).map(slot => {
         const cup = slot.querySelector('.cup');
@@ -230,7 +231,11 @@ function checkArrangement() {
     const correctCount = calculateCorrectCups(currentOrder);
 
     // Show message indicating correct cups out of total
-    showModal(`${correctCount} out of ${correctOrder.length} cups are correct. Try again!`);
+    showModal(`${correctCount} out of ${correctOrder.length} cups are correct. ${correctCount === correctOrder.length ? 'Level complete!' : 'Try again!'}`);
+
+    if (correctCount === correctOrder.length) {
+        handleLevelCompletion();
+    }
 }
 
 function calculateCorrectCups(order) {
