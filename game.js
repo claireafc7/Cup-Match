@@ -32,8 +32,10 @@ function setupEventListeners() {
 
 function preventPageRefresh() {
     window.addEventListener('beforeunload', (event) => {
-        event.preventDefault();
-        event.returnValue = ''; // Triggers confirmation dialog on refresh
+        if (!isPaused) {
+            event.preventDefault();
+            event.returnValue = ''; // Triggers confirmation dialog on refresh
+        }
     });
 }
 
@@ -165,11 +167,10 @@ function dragOver(event) {
 function drop(event) {
     event.preventDefault();
     if (isPaused) return;
-    
+
     const targetSlot = event.target.closest('.cup-slot');
     if (targetSlot && selectedCupElement) {
         const existingCup = targetSlot.querySelector('.cup');
-        console.log('Dropping:', selectedCupElement.style.backgroundColor, 'Into slot:', targetSlot);
         if (!existingCup || existingCup !== selectedCupElement) {
             swapCups(targetSlot);
         }
@@ -268,10 +269,8 @@ function getArrangedCups() {
     const slots = document.querySelectorAll('#arrangement-container .cup-slot');
     const cups = Array.from(slots).map(slot => {
         const cup = slot.querySelector('.cup');
-        console.log('Slot:', slot, 'Cup:', cup);
         return cup ? cup.style.backgroundColor : null;
     });
-    console.log('Arranged Cups:', cups);
     return cups;
 }
 

@@ -141,12 +141,11 @@ button:hover {
     justify-content: center;
     margin: 0 5px;
     position: relative;
+    transition: background-color 0.3s; /* Smooth transition for visual feedback */
 }
 
-/* Highlight effect for drag and drop */
 .cup-slot.highlight {
-    border-color: #ff0; /* Yellow border for highlight */
-    background-color: #fafafa; /* Slightly lighter background */
+    background-color: lightgreen; /* Highlight color for valid drop targets */
 }
 
 /* Game Page Styling */
@@ -171,7 +170,7 @@ button:hover {
 }
 
 /* Modal Styling */
-.modal {
+.modal, #instructions-modal {
     display: none;
     position: fixed;
     z-index: 1000;
@@ -188,55 +187,17 @@ button:hover {
     max-width: 400px;
 }
 
-.modal h2 {
+.modal h2, #instructions-modal h2 {
     font-size: 1.5rem;
     margin-bottom: 10px;
 }
 
-.modal p {
+.modal p, #instructions-modal p {
     font-size: 1rem;
     margin-bottom: 20px;
 }
 
-.modal button {
-    background-color: burlywood;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 10px;
-    font-size: 1rem;
-    cursor: pointer;
-}
-
-/* Instructions Modal Styling */
-#instructions-modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    background-color: whitesmoke;
-    padding: 20px;
-    border: 2px solid black;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    width: 80%;
-    max-width: 400px;
-}
-
-#instructions-modal h2 {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-}
-
-#instructions-modal p {
-    font-size: 1rem;
-    margin-bottom: 20px;
-}
-
-#instructions-modal button {
+.modal button, #instructions-modal button {
     background-color: burlywood;
     color: white;
     padding: 10px 20px;
@@ -330,5 +291,3 @@ button:hover {
         font-size: 1rem;
     }
 }
-
-
