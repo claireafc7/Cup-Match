@@ -1,39 +1,39 @@
 // Game Configuration and State Variables
 const levels = [
     { cupCount: 3, timeLimit: 60, killer: false },
-    { cupCount: 3, timeLimit: 45, killer: false },
+    { cupCount: 3, timeLimit: 45, killer: true },
     { cupCount: 3, timeLimit: 30, killer: false },
     { cupCount: 4, timeLimit: 60, killer: true },
     { cupCount: 4, timeLimit: 45, killer: false },
     { cupCount: 5, timeLimit: 60, killer: false },
-    { cupCount: 5, timeLimit: 45, killer: false },
-    { cupCount: 6, timeLimit: 60, killer: true },
+    { cupCount: 5, timeLimit: 45, killer: true },
+    { cupCount: 6, timeLimit: 60, killer: false },
     { cupCount: 7, timeLimit: 60, killer: false },
-    { cupCount: 8, timeLimit: 60, killer: false },
+    { cupCount: 8, timeLimit: 60, killer: true },
     { cupCount: 9, timeLimit: 60, killer: false },
     { cupCount: 10, timeLimit: 60, killer: false },
-    { cupCount: 10, timeLimit: 75, killer: true, duplicateColors: 2 },
-    { cupCount: 10, timeLimit: 75, killer: false, duplicateColors: 4 },
-    { cupCount: 12, timeLimit: 75, killer: false, duplicateColors: 6 },
-    { cupCount: 12, timeLimit: 75, killer: false, duplicateColors: 2 },
-    { cupCount: 12, timeLimit: 75, killer: true, duplicateColors: 4 },
-    { cupCount: 10, timeLimit: 90, killer: false, extraCups: 4 },
-    { cupCount: 10, timeLimit: 90, killer: false, extraCups: 6 },
-    { cupCount: 12, timeLimit: 90, killer: false, extraCups: 4 }
+    { cupCount: 10, timeLimit: 75, duplicateColors: 2, killer: true },
+    { cupCount: 10, timeLimit: 75, duplicateColors: 4, killer: false },
+    { cupCount: 12, timeLimit: 75, duplicateColors: 6, killer: false },
+    { cupCount: 12, timeLimit: 75, duplicateColors: 2, killer: true },
+    { cupCount: 12, timeLimit: 75, duplicateColors: 4, killer: false },
+    { cupCount: 10, timeLimit: 90, extraCups: 4, killer: false },
+    { cupCount: 10, timeLimit: 90, extraCups: 6, killer: true },
+    { cupCount: 12, timeLimit: 90, extraCups: 4, killer: false }
 ];
 
-let currentLevel = 0;
+let currentLevelIndex = 0;
 let timerInterval;
 let shuffledCups = [];
 let correctOrder = [];
 let selectedCupElement = null;
-let draggedOverElement = null;
 let isPaused = false;
 let killerCupIndex = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     preventPageRefresh();
+    startGame(); // Start the game from the first level
 });
 
 function setupEventListeners() {
@@ -59,14 +59,14 @@ function startGame() {
 }
 
 function startLevel() {
-    const levelData = levels[Math.floor(Math.random() * levels.length)];
+    const levelData = levels[currentLevelIndex];
     updateLevelInfo(levelData);
 
     const totalCups = levelData.cupCount + (levelData.extraCups || 0);
     shuffledCups = generateCups(totalCups, levelData.cupCount, levelData.duplicateColors || 0);
     correctOrder = shuffledCups.slice(0, levelData.cupCount); // First N cups are the correct order
 
-    // Determine if a killer cup is needed
+    // Assign a killer cup if specified in the level
     if (levelData.killer) {
         killerCupIndex = Math.floor(Math.random() * shuffledCups.length); // Randomly assign killer cup
         shuffledCups[killerCupIndex].isKiller = true; // Mark one cup as the killer cup
@@ -79,7 +79,7 @@ function startLevel() {
 }
 
 function updateLevelInfo(levelData) {
-    document.getElementById('level').innerText = `Level ${currentLevel + 1}`;
+    document.getElementById('level').innerText = `Level ${currentLevelIndex + 1}`;
     document.getElementById('time-left').innerText = levelData.timeLimit;
 }
 
@@ -95,7 +95,7 @@ function generateCups(totalCupCount, actualCupCount, duplicateColors = 0) {
     // Generate cups with colors
     const cups = [];
     for (let i = 0; i < totalCupCount; i++) {
-        cups.push({ color: selectedColors[i % selectedColors.length], id: i, isKiller: false });
+        cups.push({ color: selectedColors[i % selectedColors.length], id: i });
     }
 
     return shuffleArray(cups);
@@ -185,10 +185,6 @@ function startTimer(duration) {
                 alert('Time is up! Game Over.');
                 endGame();
             }
-
-            if (timeLeft <= 10) {
-                timeLeftElement.classList.add('warning');
-            }
         }
     }, 1000);
 }
@@ -196,42 +192,42 @@ function startTimer(duration) {
 function checkArrangement() {
     const slots = document.querySelectorAll('#arrangement-container .cup-slot');
     const currentArrangement = Array.from(slots).map(slot => slot.firstChild ? slot.firstChild.dataset.id : null);
-    const correctArrangement = correctOrder.map(cup => cup.id);
 
-    const correctCount = currentArrangement.reduce((count, id, index) => {
-        return count + (id === correctArrangement[index] ? 1 : 0);
-    }, 0);
+    const correctCount = currentArrangement.filter((id, index) => id === correctOrder[index]?.id).length;
+    const totalCount = correctOrder.length;
 
-    if (JSON.stringify(currentArrangement) === JSON.stringify(correctArrangement)) {
-        showModal(`Correct! You have placed ${correctCount} out of ${correctArrangement.length} cups correctly. Moving to the next level.`);
-        currentLevel++;
-        startLevel();
+    showModal(`You have ${correctCount} correct cups out of ${totalCount}!`);
+
+    if (correctCount === totalCount) {
+        alert('Correct! Moving to the next level.');
+        currentLevelIndex++;
+        if (currentLevelIndex < levels.length) {
+            startLevel();
+        } else {
+            alert('Congratulations! You have completed all levels.');
+            endGame();
+        }
     } else {
-        showModal(`Incorrect arrangement. You have placed ${correctCount} out of ${correctArrangement.length} cups correctly. Try again!`);
+        alert('Incorrect arrangement. Try again.');
     }
+}
+
+function resetGame() {
+    alert('You have picked the killer cup! Game Over.');
+    endGame();
 }
 
 function togglePause() {
     isPaused = !isPaused;
-    document.getElementById('pause-game').innerText = isPaused ? 'Resume Game' : 'Pause Game';
+    document.getElementById('pause-game').innerText = isPaused ? 'Resume' : 'Pause';
 }
 
 function endGame() {
-    switchToPage('home-page');
     clearInterval(timerInterval);
-    resetGame();
-}
-
-function resetGame() {
     document.getElementById('stack-container').innerHTML = '';
     document.getElementById('arrangement-container').innerHTML = '';
-    document.getElementById('time-left').classList.remove('warning');
-    clearInterval(timerInterval);
-}
-
-function showModal(message) {
-    document.getElementById('result-message').innerText = message;
-    document.getElementById('modal').style.display = 'block';
+    document.getElementById('time-left').innerText = '0';
+    switchToPage('home-page');
 }
 
 function showInstructions() {
@@ -246,3 +242,4 @@ function switchToPage(pageId) {
     document.querySelectorAll('.page').forEach(page => page.style.display = 'none');
     document.getElementById(pageId).style.display = 'block';
 }
+
