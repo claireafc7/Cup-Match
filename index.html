@@ -23,6 +23,7 @@
         <div id="stack-container" class="cup-container"></div>
         <div id="arrangement-container" class="cup-container"></div>
         <button id="check-arrangement">Check Arrangement</button>
+        <button id="pause-game">Pause Game</button> <!-- Added Pause Button -->
         <button id="end-game">End Game</button>
     </div>
 
@@ -55,6 +56,8 @@
             const instructionsButton = document.getElementById('instructions-button');
             const instructionsModal = document.getElementById('instructions-modal');
             const closeInstructionsButton = document.getElementById('close-instructions');
+            const modal = document.getElementById('modal');
+            const modalCloseButton = document.getElementById('modal-close');
 
             // Show the instructions modal when the instructions button is clicked
             instructionsButton.addEventListener('click', () => {
@@ -66,10 +69,16 @@
                 instructionsModal.style.display = 'none';
             });
 
+            // Close the general modal when the close button is clicked
+            modalCloseButton.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+
             // Close the modal if the user clicks outside of it
             window.addEventListener('click', (event) => {
-                if (event.target == instructionsModal) {
+                if (event.target == instructionsModal || event.target == modal) {
                     instructionsModal.style.display = 'none';
+                    modal.style.display = 'none';
                 }
             });
         });
