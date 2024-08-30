@@ -99,7 +99,12 @@ button:hover {
     clip-path: polygon(20% 0%, 80% 0%, 90% 100%, 10% 100%);
     margin: 0 auto;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.3s; /* Smooth color transition */
+    transition: transform 0.2s; /* Smooth transition for visual feedback */
+}
+
+.cup.dragging {
+    opacity: 0.5;
+    transform: scale(1.1); /* Slightly enlarge the cup during drag */
 }
 
 .cup::before {
@@ -125,13 +130,6 @@ button:hover {
     border-radius: 0 0 10px 10px;
 }
 
-/* Killer Cup Style */
-.cup.killer-cup {
-    background-color: black; /* Distinctive color for killer cup */
-    border: 2px solid red; /* Red border for visibility */
-}
-
-/* Cup Slot Style */
 .cup-slot {
     width: 100px;
     height: 130px;
@@ -143,6 +141,12 @@ button:hover {
     justify-content: center;
     margin: 0 5px;
     position: relative;
+}
+
+/* Highlight effect for drag and drop */
+.cup-slot.highlight {
+    border-color: #ff0; /* Yellow border for highlight */
+    background-color: #fafafa; /* Slightly lighter background */
 }
 
 /* Game Page Styling */
@@ -195,6 +199,44 @@ button:hover {
 }
 
 .modal button {
+    background-color: burlywood;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+/* Instructions Modal Styling */
+#instructions-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: whitesmoke;
+    padding: 20px;
+    border: 2px solid black;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 80%;
+    max-width: 400px;
+}
+
+#instructions-modal h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+#instructions-modal p {
+    font-size: 1rem;
+    margin-bottom: 20px;
+}
+
+#instructions-modal button {
     background-color: burlywood;
     color: white;
     padding: 10px 20px;
@@ -288,4 +330,5 @@ button:hover {
         font-size: 1rem;
     }
 }
+
 

@@ -165,10 +165,14 @@ function dragOver(event) {
 function drop(event) {
     event.preventDefault();
     if (isPaused) return;
+    
     const targetSlot = event.target.closest('.cup-slot');
-
     if (targetSlot && selectedCupElement) {
-        swapCups(targetSlot);
+        const existingCup = targetSlot.querySelector('.cup');
+        console.log('Dropping:', selectedCupElement.style.backgroundColor, 'Into slot:', targetSlot);
+        if (!existingCup || existingCup !== selectedCupElement) {
+            swapCups(targetSlot);
+        }
     }
 }
 
@@ -207,30 +211,49 @@ function touchMove(event) {
 
 function touchEnd() {
     if (isPaused) return;
-    if (draggedOverElement && draggedOverElement.classList.contains('cup-slot') && selectedCupElement) {
-        swapCups(draggedOverElement); // Swap cups using touch
-    }
-    resetTouchVariables();
-}
-
-function resetTouchVariables() {
     if (draggedOverElement) {
+        const targetSlot = draggedOverElement;
+        swapCups(targetSlot);
         draggedOverElement.classList.remove('highlight');
     }
-    if (selectedCupElement) {
-        selectedCupElement.classList.remove('dragging'); // Remove dragging class
-    }
+    selectedCupElement.classList.remove('dragging');
     selectedCupElement = null;
-    draggedOverElement = null;
 }
 
-function returnCupToStack(event) {
-    if (isPaused) return;
-    document.getElementById('stack-container').appendChild(event.target); // Return cup to stack
+// Timer Functions
+function startTimer(seconds) {
+    const timeLeftElement = document.getElementById('time-left');
+    let timeLeft = seconds;
+
+    timerInterval = setInterval(() => {
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            endGame();
+            return;
+        }
+        timeLeft--;
+        timeLeftElement.innerText = timeLeft;
+        if (timeLeft <= 10) {
+            timeLeftElement.classList.add('warning');
+        }
+    }, 1000);
+}
+
+function togglePause() {
+    isPaused = !isPaused;
+    document.getElementById('pause-game').innerText = isPaused ? 'Resume Game' : 'Pause Game';
+    document.getElementById('level-info').classList.toggle('paused', isPaused);
+}
+
+// End Game Function
+function endGame() {
+    clearInterval(timerInterval);
+    showModal('Game Over! Click Start Game to play again.');
 }
 
 function checkArrangement() {
     if (isPaused) return;
+
     const arrangedCups = getArrangedCups();
     const correctCount = calculateCorrectCups(arrangedCups);
 
@@ -242,84 +265,31 @@ function checkArrangement() {
 }
 
 function getArrangedCups() {
-    return [...document.getElementById('arrangement-container').children].map(slot => {
+    const slots = document.querySelectorAll('#arrangement-container .cup-slot');
+    const cups = Array.from(slots).map(slot => {
         const cup = slot.querySelector('.cup');
-        return cup ? cup.style.backgroundColor + (cup.getAttribute('data-cup-id') || '') : null;
+        console.log('Slot:', slot, 'Cup:', cup);
+        return cup ? cup.style.backgroundColor : null;
     });
+    console.log('Arranged Cups:', cups);
+    return cups;
 }
 
 function calculateCorrectCups(arrangedCups) {
-    return arrangedCups.reduce((count, colorId, index) => {
-        const [color, id] = colorId.split(/(?<=\D)(?=\d)/); // Split color and ID
-        const correctCup = correctOrder[index];
-        return count + ((color === correctCup.color) && (id === correctCup.id) ? 1 : 0);
+    return arrangedCups.reduce((count, color, index) => {
+        const correctColor = correctOrder[index] ? correctOrder[index].color : null;
+        return count + (color === correctColor ? 1 : 0);
     }, 0);
 }
 
 function handleLevelCompletion() {
-    clearInterval(timerInterval);
-
-    if (currentLevel + 1 < levels.length) {
-        showModal('Correct! Moving to the next level.');
-        currentLevel++;
+    showModal('Congratulations! Level Completed.');
+    currentLevel++;
+    if (currentLevel < levels.length) {
         startLevel();
     } else {
-        showModal('Congratulations! You have completed all levels!');
-        endGame();
+        showModal('Congratulations! You have completed all levels.');
     }
-}
-
-function startTimer(seconds) {
-    let timeLeft = seconds;
-    const timeLeftElement = document.getElementById('time-left');
-    updateTimeLeft(timeLeft, timeLeftElement);
-
-    timerInterval = setInterval(() => {
-        if (!isPaused) {
-            updateTimeLeft(--timeLeft, timeLeftElement);
-
-            if (timeLeft <= 0) {
-                clearInterval(timerInterval);
-                showModal('Time\'s up! Game over.');
-                endGame();
-            }
-        }
-    }, 1000);
-}
-
-function updateTimeLeft(timeLeft, timeLeftElement) {
-    timeLeftElement.innerText = timeLeft;
-    if (timeLeft <= 10) {
-        timeLeftElement.classList.add('warning');
-    } else {
-        timeLeftElement.classList.remove('warning');
-    }
-}
-
-function togglePause() {
-    const pauseButton = document.getElementById('pause-game');
-    if (isPaused) {
-        isPaused = false;
-        pauseButton.innerText = 'Pause Game';
-        startTimer(parseInt(document.getElementById('time-left').innerText)); // Resume timer
-        pauseButton.style.backgroundColor = 'orange'; // Orange color when active
-    } else {
-        isPaused = true;
-        pauseButton.innerText = 'Resume Game';
-        clearInterval(timerInterval); // Pause timer
-        pauseButton.style.backgroundColor = 'gray'; // Gray color when paused
-    }
-}
-
-function endGame() {
-    clearInterval(timerInterval);
-    switchToPage('home-page');
-    currentLevel = 0;
-}
-
-function switchToPage(pageId) {
-    document.querySelectorAll('.page').forEach(page => page.style.display = 'none');
-    document.getElementById(pageId).style.display = 'block';
 }
 
 function showModal(message) {
@@ -328,11 +298,25 @@ function showModal(message) {
     modal.style.display = 'block';
 }
 
+function closeModal(modal) {
+    modal.style.display = 'none';
+}
+
 function showInstructions() {
     const instructionsModal = document.getElementById('instructions-modal');
     instructionsModal.style.display = 'block';
 }
 
-function closeModal(modal) {
-    modal.style.display = 'none';
+function returnCupToStack(event) {
+    if (isPaused) return;
+    const cupElement = event.target;
+    const stackContainer = document.getElementById('stack-container');
+    stackContainer.appendChild(cupElement);
+    cupElement.classList.remove('dragging');
+}
+
+function switchToPage(pageId) {
+    document.getElementById('home-page').style.display = 'none';
+    document.getElementById('game-page').style.display = 'none';
+    document.getElementById(pageId).style.display = 'flex';
 }
