@@ -1,245 +1,244 @@
-// Game Configuration and State Variables
+// Game Logic
 const levels = [
-    { cupCount: 3, timeLimit: 60, killer: false },
-    { cupCount: 3, timeLimit: 45, killer: true },
-    { cupCount: 3, timeLimit: 30, killer: false },
-    { cupCount: 4, timeLimit: 60, killer: true },
-    { cupCount: 4, timeLimit: 45, killer: false },
-    { cupCount: 5, timeLimit: 60, killer: false },
-    { cupCount: 5, timeLimit: 45, killer: true },
-    { cupCount: 6, timeLimit: 60, killer: false },
-    { cupCount: 7, timeLimit: 60, killer: false },
-    { cupCount: 8, timeLimit: 60, killer: true },
-    { cupCount: 9, timeLimit: 60, killer: false },
-    { cupCount: 10, timeLimit: 60, killer: false },
-    { cupCount: 10, timeLimit: 75, duplicateColors: 2, killer: true },
-    { cupCount: 10, timeLimit: 75, duplicateColors: 4, killer: false },
-    { cupCount: 12, timeLimit: 75, duplicateColors: 6, killer: false },
-    { cupCount: 12, timeLimit: 75, duplicateColors: 2, killer: true },
-    { cupCount: 12, timeLimit: 75, duplicateColors: 4, killer: false },
-    { cupCount: 10, timeLimit: 90, extraCups: 4, killer: false },
-    { cupCount: 10, timeLimit: 90, extraCups: 6, killer: true },
-    { cupCount: 12, timeLimit: 90, extraCups: 4, killer: false }
+    {
+        cups: 3, // Number of cups
+        extras: 0, // Extra cups not in the correct arrangement
+        duplicates: 0, // Duplicate cups in the correct arrangement
+        timeLimit: 60, // Time limit for this level
+        killerCups: [1] // Indexes of cups that are killer cups (0-based index)
+    },
+    {
+        cups: 4,
+        extras: 2,
+        duplicates: 1,
+        timeLimit: 50,
+        killerCups: [2] // Indexes of cups that are killer cups (0-based index)
+    },
+    {
+        cups: 5,
+        extras: 3,
+        duplicates: 2,
+        timeLimit: 40,
+        killerCups: [0, 3] // Indexes of cups that are killer cups (0-based index)
+    }
 ];
 
-let currentLevelIndex = 0;
-let timerInterval;
-let shuffledCups = [];
+const colors = [
+    'red', 'blue', 'green', 'yellow', 'purple', 'orange',
+    'pink', 'cyan', 'magenta', 'lime', 'teal', 'indigo',
+    'violet', 'brown', 'gray', 'olive', 'maroon', 'navy',
+    'gold', 'silver'
+];
+
+let currentLevel = 0;
 let correctOrder = [];
-let selectedCupElement = null;
-let isPaused = false;
-let killerCupIndex = null;
+let currentOrder = [];
+let timeLeft;
+let countdownInterval;
+let killerCups;
 
 document.addEventListener('DOMContentLoaded', () => {
-    setupEventListeners();
-    preventPageRefresh();
-    startGame(); // Start the game from the first level
-});
+    const cupsContainer = document.getElementById('stack-container');
+    const slotsContainer = document.getElementById('arrangement-container');
+    const checkButton = document.getElementById('check-arrangement');
+    const timeLeftElement = document.getElementById('time-left');
+    const levelElement = document.getElementById('level');
+    const startGameButton = document.getElementById('start-game');
+    const gamePage = document.getElementById('game-page');
+    const homePage = document.getElementById('home-page');
+    const modal = document.getElementById('modal');
+    const modalCloseButton = document.getElementById('modal-close');
 
-function setupEventListeners() {
-    document.getElementById('start-game').addEventListener('click', startGame);
-    document.getElementById('end-game').addEventListener('click', endGame);
-    document.getElementById('check-arrangement').addEventListener('click', checkArrangement);
-    document.getElementById('pause-game').addEventListener('click', togglePause);
-    document.getElementById('instructions-button').addEventListener('click', showInstructions);
-    document.getElementById('modal-close').addEventListener('click', () => closeModal(document.getElementById('modal')));
-    document.getElementById('close-instructions').addEventListener('click', () => closeModal(document.getElementById('instructions-modal')));
-}
+    startGameButton.addEventListener('click', startGame);
 
-function preventPageRefresh() {
-    window.addEventListener('beforeunload', (event) => {
-        event.preventDefault();
-        event.returnValue = ''; // Triggers confirmation dialog on refresh
+    modalCloseButton.addEventListener('click', () => {
+        modal.style.display = 'none';
     });
-}
 
-function startGame() {
-    switchToPage('game-page');
-    startLevel();
-}
-
-function startLevel() {
-    const levelData = levels[currentLevelIndex];
-    updateLevelInfo(levelData);
-
-    const totalCups = levelData.cupCount + (levelData.extraCups || 0);
-    shuffledCups = generateCups(totalCups, levelData.cupCount, levelData.duplicateColors || 0);
-    correctOrder = shuffledCups.slice(0, levelData.cupCount); // First N cups are the correct order
-
-    // Assign a killer cup if specified in the level
-    if (levelData.killer) {
-        killerCupIndex = Math.floor(Math.random() * shuffledCups.length); // Randomly assign killer cup
-        shuffledCups[killerCupIndex].isKiller = true; // Mark one cup as the killer cup
+    // Start Game Function
+    function startGame() {
+        homePage.style.display = 'none';
+        gamePage.style.display = 'block';
+        currentLevel = 0; // Ensure starting from the first level
+        setupLevel();
+        startTimer();
     }
 
-    displayCupsInStack(shuffledCups);
-    createCupSlots(levelData.cupCount); // Create slots based on the cup count
+    // Setup Level
+    function setupLevel() {
+        const levelConfig = levels[currentLevel];
+        correctOrder = generateRandomArrangement(levelConfig.cups, levelConfig.duplicates);
+        currentOrder = [];
+        cupsContainer.innerHTML = '';
+        slotsContainer.innerHTML = '';
+        killerCups = levelConfig.killerCups;
 
-    startTimer(levelData.timeLimit);
-}
+        // Create cups and slots based on level configuration
+        createCups(levelConfig.cups, levelConfig.extras);
+        createSlots(levelConfig.cups);
 
-function updateLevelInfo(levelData) {
-    document.getElementById('level').innerText = `Level ${currentLevelIndex + 1}`;
-    document.getElementById('time-left').innerText = levelData.timeLimit;
-}
-
-function generateCups(totalCupCount, actualCupCount, duplicateColors = 0) {
-    const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown', 'beige', 'teal', 'black', 'white', 'cyan', 'lilac', 'burlywood', 'gold', 'grey'];
-    let selectedColors = colors.slice(0, actualCupCount - duplicateColors);
-
-    // Add duplicate colors
-    for (let i = 0; i < duplicateColors; i++) {
-        selectedColors.push(selectedColors[Math.floor(Math.random() * selectedColors.length)]);
+        levelElement.textContent = `Level ${currentLevel + 1}`;
+        timeLeft = levelConfig.timeLimit;
+        timeLeftElement.textContent = `${timeLeft} seconds`; // Display time with "seconds"
+        checkButton.disabled = true;
     }
 
-    // Generate cups with colors
-    const cups = [];
-    for (let i = 0; i < totalCupCount; i++) {
-        cups.push({ color: selectedColors[i % selectedColors.length], id: i });
+    // Create Cups (with extra or duplicate options)
+    function createCups(cupCount, extras) {
+        let cupColors = correctOrder.slice(); // Start with the correct arrangement
+
+        // Add extra random colors
+        for (let i = 0; i < extras; i++) {
+            cupColors.push(colors[Math.floor(Math.random() * colors.length)]);
+        }
+
+        // Shuffle cupColors array for randomness
+        cupColors = cupColors.sort(() => Math.random() - 0.5);
+
+        // Create and append cup elements
+        cupColors.forEach((color, index) => {
+            const cup = document.createElement('div');
+            cup.classList.add('cup', color);
+            if (killerCups.includes(index)) {
+                cup.classList.add('killer');
+            }
+            cup.setAttribute('draggable', true);
+            cupsContainer.appendChild(cup);
+
+            cup.addEventListener('dragstart', handleDragStart);
+            cup.addEventListener('dragend', handleDragEnd);
+        });
     }
 
-    return shuffleArray(cups);
-}
+    // Create Slots
+    function createSlots(slotCount) {
+        for (let i = 0; i < slotCount; i++) {
+            const slot = document.createElement('div');
+            slot.classList.add('cup-slot');
+            slotsContainer.appendChild(slot);
 
-function shuffleArray(array) {
-    return array.sort(() => Math.random() - 0.5);
-}
-
-function displayCupsInStack(cups) {
-    const stackContainer = document.getElementById('stack-container');
-    stackContainer.innerHTML = ''; // Clear previous cups
-
-    cups.forEach(cup => {
-        const cupElement = createCupElement(cup.color, cup.id, cup.isKiller);
-        stackContainer.appendChild(cupElement);
-    });
-}
-
-function createCupSlots(count) {
-    const arrangementContainer = document.getElementById('arrangement-container');
-    arrangementContainer.innerHTML = ''; // Clear previous slots
-
-    for (let i = 0; i < count; i++) {
-        const slotElement = document.createElement('div');
-        slotElement.classList.add('cup-slot');
-        slotElement.dataset.index = i;
-
-        slotElement.addEventListener('dragover', (e) => e.preventDefault());
-        slotElement.addEventListener('drop', handleDrop);
-
-        arrangementContainer.appendChild(slotElement);
-    }
-}
-
-function createCupElement(color, id, isKiller = false) {
-    const cupElement = document.createElement('div');
-    cupElement.classList.add('cup');
-    cupElement.style.backgroundColor = color;
-    cupElement.dataset.id = id;
-    cupElement.dataset.isKiller = isKiller;
-
-    cupElement.draggable = true;
-    cupElement.addEventListener('dragstart', (e) => handleDragStart(e, cupElement));
-    cupElement.addEventListener('dragend', (e) => handleDragEnd(e, cupElement));
-
-    return cupElement;
-}
-
-function handleDragStart(event, cupElement) {
-    event.dataTransfer.setData('text/plain', cupElement.dataset.id);
-    selectedCupElement = cupElement;
-    setTimeout(() => {
-        cupElement.classList.add('dragging');
-    }, 0);
-}
-
-function handleDragEnd(event, cupElement) {
-    cupElement.classList.remove('dragging');
-    selectedCupElement = null;
-}
-
-function handleDrop(event) {
-    event.preventDefault();
-
-    if (selectedCupElement) {
-        const slotElement = event.currentTarget;
-        slotElement.appendChild(selectedCupElement);
-
-        if (selectedCupElement.dataset.isKiller === 'true') {
-            resetGame();
+            slot.addEventListener('dragover', handleDragOver);
+            slot.addEventListener('drop', handleDrop);
         }
     }
-}
 
-function startTimer(duration) {
-    const timeLeftElement = document.getElementById('time-left');
-    let timeLeft = duration;
+    // Generate Random Arrangement
+    function generateRandomArrangement(cupCount, duplicates) {
+        let arrangement = [];
 
-    timerInterval = setInterval(() => {
-        if (!isPaused) {
-            timeLeft--;
-            timeLeftElement.innerText = timeLeft;
+        for (let i = 0; i < cupCount - duplicates; i++) {
+            arrangement.push(colors[Math.floor(Math.random() * colors.length)]);
+        }
 
-            if (timeLeft <= 0) {
-                clearInterval(timerInterval);
-                alert('Time is up! Game Over.');
-                endGame();
+        // Add duplicate cups
+        for (let i = 0; i < duplicates; i++) {
+            arrangement.push(arrangement[Math.floor(Math.random() * arrangement.length)]);
+        }
+
+        // Shuffle and return the arrangement
+        return arrangement.sort(() => Math.random() - 0.5);
+    }
+
+    // Drag and Drop Logic
+    function handleDragStart(e) {
+        e.dataTransfer.setData('color', this.classList[1]); // Get the color class (e.g., 'red', 'blue')
+        this.classList.add('dragging');
+    }
+
+    function handleDragEnd() {
+        this.classList.remove('dragging');
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault(); // Necessary to allow dropping
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        const color = e.dataTransfer.getData('color');
+        const cupElement = Array.from(cupsContainer.children).find(cup => cup.classList.contains(color));
+
+        // Prevent placing more than one cup in a slot
+        if (!this.classList.contains('red') && !this.classList.contains('blue') && !this.classList.contains('green') &&
+            !this.classList.contains('yellow') && !this.classList.contains('purple') && !this.classList.contains('orange') &&
+            !this.classList.contains('pink') && !this.classList.contains('cyan') && !this.classList.contains('magenta') &&
+            !this.classList.contains('lime') && !this.classList.contains('teal') && !this.classList.contains('indigo') &&
+            !this.classList.contains('violet') && !this.classList.contains('brown') && !this.classList.contains('gray') &&
+            !this.classList.contains('olive') && !this.classList.contains('maroon') && !this.classList.contains('navy') &&
+            !this.classList.contains('gold') && !this.classList.contains('silver')) {
+            this.classList.add(color);
+            currentOrder.push(color);
+
+            // Check if all slots are filled
+            if (currentOrder.length === correctOrder.length) {
+                checkButton.disabled = false; // Enable check button once all slots are filled
             }
         }
-    }, 1000);
-}
 
-function checkArrangement() {
-    const slots = document.querySelectorAll('#arrangement-container .cup-slot');
-    const currentArrangement = Array.from(slots).map(slot => slot.firstChild ? slot.firstChild.dataset.id : null);
-
-    const correctCount = currentArrangement.filter((id, index) => id === correctOrder[index]?.id).length;
-    const totalCount = correctOrder.length;
-
-    showModal(`You have ${correctCount} correct cups out of ${totalCount}!`);
-
-    if (correctCount === totalCount) {
-        alert('Correct! Moving to the next level.');
-        currentLevelIndex++;
-        if (currentLevelIndex < levels.length) {
-            startLevel();
-        } else {
-            alert('Congratulations! You have completed all levels.');
-            endGame();
+        // Check if a killer cup was dropped
+        if (cupElement.classList.contains('killer')) {
+            showMessage('Game Over! You placed a killer cup.'); // Display message for killer cup
+            disableInteraction();
         }
-    } else {
-        alert('Incorrect arrangement. Try again.');
     }
-}
 
-function resetGame() {
-    alert('You have picked the killer cup! Game Over.');
-    endGame();
-}
+    function checkArrangement() {
+        let correctCount = 0;
 
-function togglePause() {
-    isPaused = !isPaused;
-    document.getElementById('pause-game').innerText = isPaused ? 'Resume' : 'Pause';
-}
+        // Compare current order with correct order
+        for (let i = 0; i < correctOrder.length; i++) {
+            const slot = slotsContainer.children[i];
+            if (currentOrder[i] === correctOrder[i]) {
+                slot.classList.add('correct');
+                correctCount++;
+            } else {
+                slot.classList.add('incorrect');
+            }
+        }
 
-function endGame() {
-    clearInterval(timerInterval);
-    document.getElementById('stack-container').innerHTML = '';
-    document.getElementById('arrangement-container').innerHTML = '';
-    document.getElementById('time-left').innerText = '0';
-    switchToPage('home-page');
-}
+        if (correctCount === correctOrder.length) {
+            showMessage(`Congratulations! All ${correctCount} cups are correct. Moving to the next level.`);
+            currentLevel++;
+            if (currentLevel < levels.length) {
+                setTimeout(setupLevel, 2000); // Move to next level after a brief delay
+            } else {
+                showMessage('You completed all levels! Well done!');
+                disableInteraction();
+            }
+        } else {
+            showMessage(`${correctCount} out of ${correctOrder.length} cups are correct. Try again!`);
+        }
+    }
 
-function showInstructions() {
-    document.getElementById('instructions-modal').style.display = 'block';
-}
+    function startTimer() {
+        countdownInterval = setInterval(() => {
+            timeLeft--;
+            timeLeftElement.textContent = `${timeLeft} seconds`; // Display time with "seconds"
 
-function closeModal(modal) {
-    modal.style.display = 'none';
-}
+            if (timeLeft <= 10) {
+                timeLeftElement.classList.add('warning');
+            }
 
-function switchToPage(pageId) {
-    document.querySelectorAll('.page').forEach(page => page.style.display = 'none');
-    document.getElementById(pageId).style.display = 'block';
-}
+            if (timeLeft <= 0) {
+                clearInterval(countdownInterval);
+                showMessage('Time\'s up! Game over.');
+                disableInteraction();
+            }
+        }, 1000);
+    }
+
+    function disableInteraction() {
+        const cups = document.querySelectorAll('.cup');
+        cups.forEach(cup => {
+            cup.setAttribute('draggable', false);
+        });
+        checkButton.disabled = true;
+    }
+
+    function showMessage(message) {
+        modal.querySelector('p').textContent = message;
+        modal.style.display = 'block';
+    }
+});
+
 
