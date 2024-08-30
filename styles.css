@@ -1,4 +1,4 @@
-/* General Body Styling */
+/* Basic styling for the game */
 body {
     font-family: Arial, sans-serif;
     display: flex;
@@ -15,7 +15,6 @@ body {
     padding: 20px;
 }
 
-/* Page Display */
 #home-page {
     display: flex;
     flex-direction: column;
@@ -27,15 +26,12 @@ body {
     display: none;
 }
 
-/* Heading Styling */
 h1 {
     color: burlywood;
     font-size: 200px;
     margin-bottom: 20px;
-    transition: font-size 0.3s ease;
 }
 
-/* Button Styling */
 button {
     padding: 12px 24px;
     border: 2px solid black;
@@ -67,34 +63,27 @@ button:hover {
     color: white;
 }
 
-#pause-game {
-    background-color: orange;
-    color: white;
-}
-
+/* New Button for How to Play Instructions */
 #instructions-button {
     background-color: cornflowerblue;
     color: white;
 }
 
-/* Stack and Arrangement Containers */
 #stack-container, #arrangement-container {
     display: flex;
     justify-content: center;
     margin: 20px 0;
     gap: 10px;
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* Allow wrapping for better fit */
 }
 
-/* Cup Container Styling */
 .cup-container {
     display: flex;
     gap: 10px;
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* Enable wrapping on all screen sizes */
     justify-content: center;
 }
 
-/* Cup Styling */
 .cup {
     width: 100px;
     height: 80px;
@@ -104,7 +93,6 @@ button:hover {
     clip-path: polygon(20% 0%, 80% 0%, 90% 100%, 10% 100%);
     margin: 0 auto;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .cup::before {
@@ -130,12 +118,12 @@ button:hover {
     border-radius: 0 0 10px 10px;
 }
 
-.cup.dragging {
-    transform: scale(1.1);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+.cup.killer {
+    background-color: black;
+    border-color: #000;
+    box-shadow: 0 4px 8px rgba(255, 0, 0, 0.5);
 }
 
-/* Cup Slot Styling */
 .cup-slot {
     width: 100px;
     height: 130px;
@@ -147,11 +135,6 @@ button:hover {
     justify-content: center;
     margin: 0 5px;
     position: relative;
-    transition: border-color 0.3s ease;
-}
-
-.cup-slot.highlight {
-    border-color: orange;
 }
 
 /* Game Page Styling */
@@ -165,7 +148,6 @@ button:hover {
 
 #level-info #level {
     font-size: 2.5rem;
-    transition: font-size 0.3s ease;
 }
 
 #level-info #time-left {
@@ -192,7 +174,6 @@ button:hover {
     text-align: center;
     width: 80%;
     max-width: 400px;
-    transition: opacity 0.3s ease;
 }
 
 .modal h2 {
@@ -206,45 +187,6 @@ button:hover {
 }
 
 .modal button {
-    background-color: burlywood;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 10px;
-    font-size: 1rem;
-    cursor: pointer;
-}
-
-/* Instructions Modal Styling */
-#instructions-modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    background-color: whitesmoke;
-    padding: 20px;
-    border: 2px solid black;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    width: 80%;
-    max-width: 400px;
-    transition: opacity 0.3s ease;
-}
-
-#instructions-modal h2 {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-}
-
-#instructions-modal p {
-    font-size: 1rem;
-    margin-bottom: 20px;
-}
-
-#instructions-modal button {
     background-color: burlywood;
     color: white;
     padding: 10px 20px;
@@ -302,6 +244,39 @@ button:hover {
     }
 
     #level-info #level {
-        font-size: 1.5rem;
+        font-size: 1.8rem;
+    }
+
+    #level-info #time-left {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 32px;
+    }
+
+    button {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+
+    .cup {
+        width: 60px;
+        height: 50px;
+    }
+
+    .cup-slot {
+        width: 60px;
+        height: 90px;
+    }
+
+    #level-info #level {
+        font-size: 1.6rem;
+    }
+
+    #level-info #time-left {
+        font-size: 1rem;
     }
 }
