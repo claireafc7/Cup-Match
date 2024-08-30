@@ -32,7 +32,7 @@ h1 {
     color: burlywood;
     font-size: 200px;
     margin-bottom: 20px;
-    transition: font-size 0.3s ease; /* Smooth font size transition */
+    transition: font-size 0.3s ease;
 }
 
 /* Button Styling */
@@ -45,7 +45,7 @@ button {
     margin: 10px;
     background-color: #fff;
     color: #000;
-    transition: background-color 0.3s, color 0.3s; /* Smooth transition for background and text color */
+    transition: background-color 0.3s, color 0.3s;
 }
 
 button:hover {
@@ -83,14 +83,14 @@ button:hover {
     justify-content: center;
     margin: 20px 0;
     gap: 10px;
-    flex-wrap: wrap; /* Allow wrapping for better fit */
+    flex-wrap: wrap;
 }
 
 /* Cup Container Styling */
 .cup-container {
     display: flex;
     gap: 10px;
-    flex-wrap: wrap; /* Enable wrapping on all screen sizes */
+    flex-wrap: wrap;
     justify-content: center;
 }
 
@@ -104,7 +104,7 @@ button:hover {
     clip-path: polygon(20% 0%, 80% 0%, 90% 100%, 10% 100%);
     margin: 0 auto;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transform and shadow transitions */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .cup::before {
@@ -131,35 +131,8 @@ button:hover {
 }
 
 .cup.dragging {
-    transform: scale(1.1); /* Slightly scale up the cup when dragging */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4); /* Enhanced shadow during drag */
-}
-
-/* Color-Coded Cups */
-.cup.red {
-    background-color: #FF6347; /* Tomato Red */
-    border-color: #CD5C5C;
-}
-
-.cup.blue {
-    background-color: #4682B4; /* Steel Blue */
-    border-color: #5F9EA0;
-}
-
-.cup.green {
-    background-color: #3CB371; /* Medium Sea Green */
-    border-color: #2E8B57;
-}
-
-/* Success and Failure Feedback */
-.cup.correct {
-    border-color: green;
-    background-color: lightgreen;
-}
-
-.cup.incorrect {
-    border-color: red;
-    background-color: lightcoral;
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
 }
 
 /* Cup Slot Styling */
@@ -174,11 +147,11 @@ button:hover {
     justify-content: center;
     margin: 0 5px;
     position: relative;
-    transition: border-color 0.3s ease; /* Smooth transition for border color */
+    transition: border-color 0.3s ease;
 }
 
 .cup-slot.highlight {
-    border-color: orange; /* Highlight color for mobile */
+    border-color: orange;
 }
 
 /* Game Page Styling */
@@ -192,7 +165,7 @@ button:hover {
 
 #level-info #level {
     font-size: 2.5rem;
-    transition: font-size 0.3s ease; /* Smooth font size transition */
+    transition: font-size 0.3s ease;
 }
 
 #level-info #time-left {
@@ -201,12 +174,6 @@ button:hover {
 
 #level-info #time-left.warning {
     color: red;
-    animation: blink 1s infinite;
-}
-
-@keyframes blink {
-    0%, 100% { color: red; }
-    50% { color: yellow; }
 }
 
 /* Modal Styling */
@@ -225,7 +192,7 @@ button:hover {
     text-align: center;
     width: 80%;
     max-width: 400px;
-    transition: opacity 0.3s ease; /* Smooth transition for modal appearance */
+    transition: opacity 0.3s ease;
 }
 
 .modal h2 {
@@ -264,7 +231,7 @@ button:hover {
     text-align: center;
     width: 80%;
     max-width: 400px;
-    transition: opacity 0.3s ease; /* Smooth transition for instructions modal appearance */
+    transition: opacity 0.3s ease;
 }
 
 #instructions-modal h2 {
@@ -335,39 +302,6 @@ button:hover {
     }
 
     #level-info #level {
-        font-size: 1.8rem;
-    }
-
-    #level-info #time-left {
-        font-size: 1.2rem;
-    }
-}
-
-@media (max-width: 480px) {
-    h1 {
-        font-size: 32px;
-    }
-
-    button {
-        font-size: 0.8rem;
-        padding: 6px 12px;
-    }
-
-    .cup {
-        width: 60px;
-        height: 50px;
-    }
-
-    .cup-slot {
-        width: 60px;
-        height: 90px;
-    }
-
-    #level-info #level {
-        font-size: 1.6rem;
-    }
-
-    #level-info #time-left {
-        font-size: 1rem;
+        font-size: 1.5rem;
     }
 }
