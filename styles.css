@@ -135,6 +135,33 @@ button:hover {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4); /* Enhanced shadow during drag */
 }
 
+/* Color-Coded Cups */
+.cup.red {
+    background-color: #FF6347; /* Tomato Red */
+    border-color: #CD5C5C;
+}
+
+.cup.blue {
+    background-color: #4682B4; /* Steel Blue */
+    border-color: #5F9EA0;
+}
+
+.cup.green {
+    background-color: #3CB371; /* Medium Sea Green */
+    border-color: #2E8B57;
+}
+
+/* Success and Failure Feedback */
+.cup.correct {
+    border-color: green;
+    background-color: lightgreen;
+}
+
+.cup.incorrect {
+    border-color: red;
+    background-color: lightcoral;
+}
+
 /* Cup Slot Styling */
 .cup-slot {
     width: 100px;
@@ -174,6 +201,12 @@ button:hover {
 
 #level-info #time-left.warning {
     color: red;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { color: red; }
+    50% { color: yellow; }
 }
 
 /* Modal Styling */
