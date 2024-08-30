@@ -19,7 +19,7 @@ const levels = [
     { cupCount: 12, timeLimit: 75, duplicateColors: 4 },
     { cupCount: 10, timeLimit: 90, extraCups: 4 },
     { cupCount: 10, timeLimit: 90, extraCups: 6 },
-    { cupCount: 12, timeLimit: 90, extraCups: 4 }
+    { cupCount: 12, timeLimit: 90, extraCups: 4, killerCup: true }
 ];
 
 let currentLevel = 0;
@@ -62,7 +62,7 @@ function startLevel() {
     updateLevelInfo(levelData);
 
     const totalCups = levelData.cupCount + (levelData.extraCups || 0);
-    shuffledCups = generateCups(totalCups, levelData.cupCount, levelData.duplicateColors || 0);
+    shuffledCups = generateCups(totalCups, levelData.cupCount, levelData.duplicateColors || 0, levelData.killerCup || false);
     correctOrder = shuffledCups.slice(0, levelData.cupCount); // First N cups are the correct order
 
     displayCupsInStack(shuffledCups);
@@ -76,7 +76,7 @@ function updateLevelInfo(levelData) {
     document.getElementById('time-left').innerText = levelData.timeLimit;
 }
 
-function generateCups(totalCupCount, actualCupCount, duplicateColors = 0) {
+function generateCups(totalCupCount, actualCupCount, duplicateColors = 0, hasKillerCup = false) {
     const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown', 'beige', 'teal', 'black', 'white', 'cyan', 'lilac', 'burlywood', 'gold', 'grey'];
     let selectedColors = colors.slice(0, actualCupCount - duplicateColors);
 
@@ -88,7 +88,12 @@ function generateCups(totalCupCount, actualCupCount, duplicateColors = 0) {
     // Generate cups with colors
     const cups = [];
     for (let i = 0; i < totalCupCount; i++) {
-        cups.push({ color: selectedColors[i % selectedColors.length], id: i });
+        cups.push({ color: selectedColors[i % selectedColors.length], id: i, type: 'normal' });
+    }
+
+    // Add a killer cup if required
+    if (hasKillerCup) {
+        cups.push({ color: 'black', id: totalCupCount, type: 'killer' }); // Killer cup has a unique color for identification
     }
 
     return shuffleArray(cups);
@@ -103,7 +108,7 @@ function displayCupsInStack(cups) {
     stackContainer.innerHTML = ''; // Clear previous cups
 
     cups.forEach(cup => {
-        const cupElement = createCupElement(cup.color, cup.id);
+        const cupElement = createCupElement(cup.color, cup.id, cup.type);
         stackContainer.appendChild(cupElement);
     });
 }
@@ -127,16 +132,17 @@ function createCupSlotElement(index) {
     return slotElement;
 }
 
-function createCupElement(color, id) {
+function createCupElement(color, id, type) {
     const cupElement = document.createElement('div');
     cupElement.className = 'cup';
     cupElement.style.backgroundColor = color;
     cupElement.setAttribute('draggable', true);
     cupElement.setAttribute('data-cup-id', id); // Unique ID for each cup
+    cupElement.setAttribute('data-cup-type', type); // Type of cup: normal or killer
 
     // Event listeners for drag and touch actions
     cupElement.addEventListener('dragstart', dragStart);
-    cupElement.addEventListener('dragend', dragEnd); 
+    cupElement.addEventListener('dragend', dragEnd);
     cupElement.addEventListener('click', returnCupToStack);
     addTouchEvents(cupElement);
 
@@ -179,6 +185,13 @@ function drop(event) {
 function swapCups(targetSlot) {
     const targetCup = targetSlot.querySelector('.cup');
 
+    if (selectedCupElement.getAttribute('data-cup-type') === 'killer') {
+        clearArrangement();
+        selectedCupElement.classList.remove('dragging'); // Remove dragging class
+        selectedCupElement = null;
+        return;
+    }
+
     if (targetCup) {
         selectedCupElement.parentElement.appendChild(targetCup); // Swap cups
     }
@@ -186,6 +199,12 @@ function swapCups(targetSlot) {
     targetSlot.appendChild(selectedCupElement);
     selectedCupElement.classList.remove('dragging'); // Remove dragging class
     selectedCupElement = null;
+}
+
+function clearArrangement() {
+    document.querySelectorAll('#arrangement-container .cup').forEach(cup => {
+        document.getElementById('stack-container').appendChild(cup); // Return cups to stack
+    });
 }
 
 // Touch Functions for Mobile
@@ -203,136 +222,91 @@ function touchMove(event) {
 
     if (touchedElement && touchedElement.classList.contains('cup-slot')) {
         draggedOverElement = touchedElement;
-        draggedOverElement.classList.add('highlight');
-    } else {
-        document.querySelectorAll('.cup-slot.highlight').forEach(el => el.classList.remove('highlight'));
     }
 }
 
-function touchEnd() {
+function touchEnd(event) {
     if (isPaused) return;
-    if (draggedOverElement && draggedOverElement.classList.contains('cup-slot') && selectedCupElement) {
-        swapCups(draggedOverElement); // Swap cups using touch
-    }
-    resetTouchVariables();
-}
-
-function resetTouchVariables() {
     if (draggedOverElement) {
-        draggedOverElement.classList.remove('highlight');
+        swapCups(draggedOverElement);
     }
-    if (selectedCupElement) {
-        selectedCupElement.classList.remove('dragging'); // Remove dragging class
-    }
+
+    selectedCupElement.classList.remove('dragging'); // Remove visual feedback
     selectedCupElement = null;
     draggedOverElement = null;
-}
-
-function returnCupToStack(event) {
-    if (isPaused) return;
-    document.getElementById('stack-container').appendChild(event.target); // Return cup to stack
 }
 
 function checkArrangement() {
     if (isPaused) return;
     const arrangedCups = getArrangedCups();
-    const correctCount = calculateCorrectCups(arrangedCups);
-
-    if (correctCount === correctOrder.length) {
-        handleLevelCompletion();
+    const correctCupCount = calculateCorrectCups(arrangedCups);
+    if (correctCupCount === correctOrder.length) {
+        // Level Complete
+        endGame();
+        alert('Congratulations! You have completed the level.');
     } else {
-        showModal(`${correctCount} out of ${correctOrder.length} cups are correct. Try again!`);
+        alert(`You have ${correctCupCount} correct cups.`);
     }
 }
 
 function getArrangedCups() {
     return [...document.getElementById('arrangement-container').children].map(slot => {
         const cup = slot.querySelector('.cup');
-        return cup ? cup.style.backgroundColor : null;
+        return cup ? { color: cup.style.backgroundColor, id: cup.getAttribute('data-cup-id') } : null;
     });
 }
 
 function calculateCorrectCups(arrangedCups) {
-    return arrangedCups.reduce((count, color, index) => {
-        const cupId = document.querySelector(`[data-cup-id="${index}"]`)?.style.backgroundColor;
-        return count + (color === cupId ? 1 : 0);
+    return arrangedCups.reduce((count, cup, index) => {
+        const correctCup = correctOrder[index];
+        return count + (cup.color === correctCup.color && cup.id === correctCup.id ? 1 : 0);
     }, 0);
 }
 
-function handleLevelCompletion() {
-    clearInterval(timerInterval);
-
-    if (currentLevel + 1 < levels.length) {
-        showModal('Correct! Moving to the next level.');
-        currentLevel++;
-        startLevel();
-    } else {
-        showModal('Congratulations! You have completed all levels!');
-        endGame();
-    }
-}
-
-function startTimer(seconds) {
-    let timeLeft = seconds;
-    const timeLeftElement = document.getElementById('time-left');
-    updateTimeLeft(timeLeft, timeLeftElement);
+function startTimer(timeLimit) {
+    const timerElement = document.getElementById('time-left');
+    let timeLeft = timeLimit;
 
     timerInterval = setInterval(() => {
-        if (!isPaused) {
-            updateTimeLeft(--timeLeft, timeLeftElement);
+        if (isPaused) return;
+        timeLeft--;
+        timerElement.innerText = timeLeft;
 
-            if (timeLeft <= 0) {
-                clearInterval(timerInterval);
-                showModal('Time\'s up! Game over.');
-                endGame();
-            }
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            endGame();
+            alert('Time\'s up!');
         }
     }, 1000);
 }
 
-function updateTimeLeft(timeLeft, timeLeftElement) {
-    timeLeftElement.innerText = timeLeft;
-    if (timeLeft <= 10) {
-        timeLeftElement.classList.add('warning');
-    } else {
-        timeLeftElement.classList.remove('warning');
-    }
+function endGame() {
+    clearInterval(timerInterval);
+    switchToPage('main-menu');
 }
 
 function togglePause() {
-    if (isPaused) {
-        isPaused = false;
-        document.getElementById('pause-game').innerText = 'Pause Game';
-        startTimer(parseInt(document.getElementById('time-left').innerText)); // Resume timer
-    } else {
-        isPaused = true;
-        document.getElementById('pause-game').innerText = 'Resume Game';
-        clearInterval(timerInterval); // Pause timer
-    }
+    isPaused = !isPaused;
+    document.getElementById('pause-game').innerText = isPaused ? 'Resume' : 'Pause';
 }
 
-function endGame() {
-    clearInterval(timerInterval);
-    switchToPage('home-page');
-    currentLevel = 0;
+function showInstructions() {
+    document.getElementById('instructions-modal').style.display = 'block';
+}
+
+function closeModal(modal) {
+    modal.style.display = 'none';
+}
+
+function returnCupToStack(event) {
+    if (isPaused) return;
+    const cupElement = event.target;
+    if (cupElement.classList.contains('cup')) {
+        document.getElementById('stack-container').appendChild(cupElement); // Return cup to stack
+    }
 }
 
 function switchToPage(pageId) {
     document.querySelectorAll('.page').forEach(page => page.style.display = 'none');
     document.getElementById(pageId).style.display = 'block';
-}
-
-function showModal(message) {
-    const modal = document.getElementById('modal');
-    modal.querySelector('p').innerText = message;
-    modal.style.display = 'block';
-}
-
-function showInstructions() {
-    const instructionsModal = document.getElementById('instructions-modal');
-    instructionsModal.style.display = 'block';
-}
-
-function closeModal(modal) {
-    modal.style.display = 'none';
 }
