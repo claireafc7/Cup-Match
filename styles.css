@@ -99,6 +99,7 @@ button:hover {
     clip-path: polygon(20% 0%, 80% 0%, 90% 100%, 10% 100%);
     margin: 0 auto;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s; /* Smooth color transition */
 }
 
 .cup::before {
@@ -124,6 +125,13 @@ button:hover {
     border-radius: 0 0 10px 10px;
 }
 
+/* Killer Cup Style */
+.cup.killer-cup {
+    background-color: black; /* Distinctive color for killer cup */
+    border: 2px solid red; /* Red border for visibility */
+}
+
+/* Cup Slot Style */
 .cup-slot {
     width: 100px;
     height: 130px;
@@ -280,3 +288,4 @@ button:hover {
         font-size: 1rem;
     }
 }
+

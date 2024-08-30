@@ -244,14 +244,15 @@ function checkArrangement() {
 function getArrangedCups() {
     return [...document.getElementById('arrangement-container').children].map(slot => {
         const cup = slot.querySelector('.cup');
-        return cup ? cup.style.backgroundColor : null;
+        return cup ? cup.style.backgroundColor + (cup.getAttribute('data-cup-id') || '') : null;
     });
 }
 
 function calculateCorrectCups(arrangedCups) {
-    return arrangedCups.reduce((count, color, index) => {
-        const cupId = document.querySelector(`[data-cup-id="${index}"]`)?.style.backgroundColor;
-        return count + (color === cupId ? 1 : 0);
+    return arrangedCups.reduce((count, colorId, index) => {
+        const [color, id] = colorId.split(/(?<=\D)(?=\d)/); // Split color and ID
+        const correctCup = correctOrder[index];
+        return count + ((color === correctCup.color) && (id === correctCup.id) ? 1 : 0);
     }, 0);
 }
 
@@ -335,4 +336,3 @@ function showInstructions() {
 function closeModal(modal) {
     modal.style.display = 'none';
 }
-
