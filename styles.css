@@ -31,7 +31,7 @@ body {
 /* Heading Styling */
 h1 {
     color: burlywood;
-    font-size: 12vw; /* Use viewport width for scaling */
+    font-size: 10vw; /* Increased font size for home page title */
     margin: 20px 0; /* Adjust margin for spacing */
     transition: font-size 0.3s ease; /* Smooth font size transition */
 }
@@ -91,15 +91,15 @@ button:hover {
 /* Cup Container Styling */
 .cup-container {
     display: flex;
-    gap: 20px; /* Fixed gap */
+    gap: 10px; /* Reduced gap for more cups per row */
     flex-wrap: wrap; /* Enable wrapping on all screen sizes */
     justify-content: center;
 }
 
 /* Cup Styling */
 .cup {
-    width: 120px; /* Fixed width */
-    height: 100px; /* Fixed height */
+    width: 100px; /* Fixed width */
+    height: 80px; /* Fixed height */
     background-color: #B48A61;
     position: relative;
     border: 2px solid #8B5E3C;
@@ -139,19 +139,19 @@ button:hover {
 
 /* Cup Slot Styling */
 .cup-slot {
-    width: 120px; /* Fixed width */
-    height: 150px; /* Fixed height */
+    width: 100px; /* Adjusted width */
+    height: 120px; /* Adjusted height */
     background-color: #eee;
     border: 2px solid #aaa;
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 10px; /* Fixed margin */
+    margin: 0 5px; /* Reduced margin */
     position: relative;
     transition: border-color 0.3s ease; /* Smooth transition for border color */
-    min-width: 100px; /* Ensure minimum width */
-    min-height: 130px; /* Ensure minimum height */
+    min-width: 80px; /* Ensure minimum width */
+    min-height: 100px; /* Ensure minimum height */
 }
 
 .cup-slot.highlight {
@@ -168,7 +168,7 @@ button:hover {
 }
 
 #level-info #level {
-    font-size: 3rem; /* Fixed font size */
+    font-size: 2.5rem; /* Fixed font size */
     transition: font-size 0.3s ease; /* Smooth font size transition */
 }
 
@@ -201,12 +201,12 @@ button:hover {
 }
 
 .modal h2 {
-    font-size: 1.5rem; /* Increased font size */
+    font-size: 1.8rem; /* Increased font size */
     margin-bottom: 10px; /* Fixed margin */
 }
 
 .modal p {
-    font-size: 1.2rem; /* Increased font size for readability */
+    font-size: 1.5rem; /* Increased font size for readability */
     margin-bottom: 20px; /* Fixed margin */
 }
 
@@ -241,12 +241,12 @@ button:hover {
 }
 
 #instructions-modal h2 {
-    font-size: 1.5rem; /* Increased font size */
+    font-size: 1.8rem; /* Increased font size */
     margin-bottom: 10px; /* Fixed margin */
 }
 
 #instructions-modal p {
-    font-size: 1.2rem; /* Increased font size for readability */
+    font-size: 1.5rem; /* Increased font size for readability */
     margin-bottom: 20px; /* Fixed margin */
 }
 
@@ -282,7 +282,7 @@ button:hover {
 
     .cup-slot {
         width: 100px; /* Adjust width */
-        height: 130px; /* Adjust height */
+        height: 120px; /* Adjust height */
     }
 
     #level-info #level {
@@ -293,11 +293,11 @@ button:hover {
 /* Responsive Design for Mobile Devices */
 @media (max-width: 768px) {
     h1 {
-        font-size: 6vw; /* Adjust font size */
+        font-size: 7vw; /* Adjust font size */
     }
 
     button {
-        font-size: 1rem; /* Adjust font size */
+        font-size: 1.1rem; /* Adjust font size */
         padding: 0.8rem 1.6rem; /* Adjust padding */
     }
 
@@ -322,22 +322,22 @@ button:hover {
 
 @media (max-width: 480px) {
     h1 {
-        font-size: 5vw; /* Adjust font size */
+        font-size: 6vw; /* Adjust font size */
     }
 
     button {
-        font-size: 0.9rem; /* Adjust font size */
+        font-size: 1rem; /* Adjust font size */
         padding: 0.6rem 1.2rem; /* Adjust padding */
     }
 
     .cup {
-        width: 60px; /* Adjust width */
+        width: 70px; /* Adjust width */
         height: 50px; /* Adjust height */
     }
 
     .cup-slot {
-        width: 60px; /* Adjust width */
-        height: 80px; /* Adjust height */
+        width: 70px; /* Adjust width */
+        height: 90px; /* Adjust height */
     }
 
     #level-info #level {
