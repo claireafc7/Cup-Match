@@ -84,15 +84,15 @@ button:hover {
 #stack-container, #arrangement-container {
     display: flex;
     justify-content: center;
-    margin: 20px 0;
-    gap: 10px;
+    margin: 10px 0;
+    gap: 5px;
     flex-wrap: wrap; /* Allow wrapping for better fit */
 }
 
 /* Cup Container Styling */
 .cup-container {
     display: flex;
-    gap: 10px;
+    gap: 5px;
     flex-wrap: wrap; /* Enable wrapping on all screen sizes */
     justify-content: center;
 }
@@ -269,13 +269,13 @@ button:hover {
     }
 
     .cup {
-        width: 80px;
-        height: 70px;
+        width: 40px;
+        height: 35px;
     }
 
     .cup-slot {
-        width: 80px;
-        height: 110px;
+        width: 40px;
+        height: 55px;
     }
 
     #level-info #level {
@@ -295,13 +295,13 @@ button:hover {
     }
 
     .cup {
-        width: 70px;
-        height: 60px;
+        width: 50px;
+        height: 45px;
     }
 
     .cup-slot {
-        width: 70px;
-        height: 100px;
+        width: 62px;
+        height: 75px;
     }
 
     #level-info #level {
@@ -324,13 +324,13 @@ button:hover {
     }
 
     .cup {
-        width: 60px;
-        height: 50px;
+        width: 30px;
+        height: px25;
     }
 
     .cup-slot {
-        width: 60px;
-        height: 90px;
+        width: 30px;
+        height: 45px;
     }
 
     #level-info #level {
