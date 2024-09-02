@@ -139,7 +139,7 @@ button:hover {
 
 /* Cup Slot Styling */
 .cup-slot {
-    width: 22vw; /* Adjusted width for 4 slots in a row */
+    width: 22vw; /* Adjusted width to fit 4 slots in a row */
     height: 25vw; /* Adjusted height for proportional scaling */
     background-color: #eee;
     border: 2px solid #aaa;
@@ -147,7 +147,7 @@ button:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 10px; /* Fixed margin */
+    margin: 5px; /* Reduced margin for fitting more slots */
     position: relative;
     transition: border-color 0.3s ease; /* Smooth transition for border color */
     min-width: 80px; /* Ensure minimum width */
@@ -288,14 +288,14 @@ button:hover {
     #level-info #level {
         font-size: 2.5rem; /* Adjust font size */
     }
+
+    #level-info #time-left {
+        font-size: 1.5rem; /* Adjust font size */
+    }
 }
 
 /* Responsive Design for Mobile Devices */
 @media (max-width: 768px) {
-    body {
-        overflow: auto; /* Enable scrolling on mobile devices */
-    }
-
     h1 {
         font-size: 10vw; /* Adjust font size */
     }
@@ -311,8 +311,8 @@ button:hover {
     }
 
     .cup-slot {
-        width: 22vw; /* Adjust width */
-        height: 25vw; /* Adjust height */
+        width: 22vw; /* Adjust width to fit 4 slots in a row */
+        height: 25vw; /* Adjust height for proportional scaling */
     }
 
     #level-info #level {
@@ -325,10 +325,6 @@ button:hover {
 }
 
 @media (max-width: 480px) {
-    body {
-        overflow: auto; /* Enable scrolling on small mobile devices */
-    }
-
     h1 {
         font-size: 6vw; /* Adjust font size */
     }
@@ -344,8 +340,8 @@ button:hover {
     }
 
     .cup-slot {
-        width: 20vw; /* Adjust width */
-        height: 22vw; /* Adjust height */
+        width: 20vw; /* Adjust width to fit 4 slots in a row */
+        height: 22vw; /* Adjust height for proportional scaling */
     }
 
     #level-info #level {
@@ -356,4 +352,3 @@ button:hover {
         font-size: 1.2rem; /* Adjust font size */
     }
 }
-
