@@ -1,5 +1,38 @@
 const levels = [
     { cupCount: 2, timeLimit: 60 },
+    { cupCount: 16, timeLimit: 60 },
+    { cupCount: 4, timeLimit: 60 },
+    { cupCount: 5, timeLimit: 60 },
+    { cupCount: 6, timeLimit: 60 },
+    { cupCount: 3, timeLimit: 45 },
+    { cupCount: 4, timeLimit: 45 },
+    { cupCount: 5, timeLimit: 45 },
+    { cupCount: 7, timeLimit: 60 },
+    { cupCount: 8, timeLimit: 60 },
+    { cupCount: 9, timeLimit: 90 },
+    { cupCount: 10, timeLimit: 90 },
+    { cupCount: 11, timeLimit: 90 },
+    { cupCount: 12, timeLimit: 90 },
+    { cupCount: 9, timeLimit: 60 },
+    { cupCount: 10, timeLimit: 75, duplicateColors: 3 },
+    { cupCount: 10, timeLimit: 75, duplicateColors: 5 },
+    { cupCount: 11, timeLimit: 75, duplicateColors: 4 },
+    { cupCount: 12, timeLimit: 75, duplicateColors: 4 },
+    { cupCount: 12, timeLimit: 75, duplicateColors: 6 },
+    { cupCount: 12, timeLimit: 100, extraCups: 2 },
+    { cupCount: 12, timeLimit: 100, extraCups: 3 },
+    { cupCount: 12, timeLimit: 100, extraCups: 5 },
+    { cupCount: 12, timeLimit: 100, extraCups: 7 },
+    { cupCount: 12, timeLimit: 100, extraCups: 8 },
+    { cupCount: 13, timeLimit: 100 },
+    { cupCount: 14, timeLimit: 110 },
+    { cupCount: 15, timeLimit: 120 },
+    { cupCount: 16, timeLimit: 120 },
+    { cupCount: 17, timeLimit: 120 },
+    { cupCount: 17, timeLimit: 140, extraCups: 2 },
+    { cupCount: 17, timeLimit: 140, extraCups: 3 },
+    { cupCount: 18, timeLimit: 140 },
+    { cupCount: 19, timeLimit: 140 },
     { cupCount: 20, timeLimit: 140 }
 ];
 
@@ -54,7 +87,7 @@ function startLevel() {
 
 function updateLevelInfo(levelData) {
     const levelElement = document.getElementById('level');
-    levelElement.innerText = `Level ${currentLevel + 1}`;
+    levelElement.innerText = Level ${currentLevel + 1};
 
     // Ensure that the level number fits within its container
     levelElement.classList.remove('level-overflow');
@@ -235,7 +268,7 @@ function checkArrangement() {
     if (correctCount === correctOrder.length) {
         handleLevelCompletion();
     } else {
-        showModal(`${correctCount} out of ${correctOrder.length} cups are correct. Try again!`);
+        showModal(${correctCount} out of ${correctOrder.length} cups are correct. Try again!);
     }
 }
 
@@ -248,7 +281,7 @@ function getArrangedCups() {
 
 function calculateCorrectCups(arrangedCups) {
     return arrangedCups.reduce((count, color, index) => {
-        const cupId = document.querySelector(`[data-cup-id="${index}"]`)?.style.backgroundColor;
+        const cupId = document.querySelector([data-cup-id="${index}"])?.style.backgroundColor;
         return count + (color === cupId ? 1 : 0);
     }, 0);
 }
