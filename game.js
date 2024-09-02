@@ -1,6 +1,6 @@
 const levels = [
     { cupCount: 2, timeLimit: 60 },
-    { cupCount: 16, timeLimit: 60 },
+    { cupCount: 3, timeLimit: 60 },
     { cupCount: 4, timeLimit: 60 },
     { cupCount: 5, timeLimit: 60 },
     { cupCount: 6, timeLimit: 60 },
