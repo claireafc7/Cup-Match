@@ -86,6 +86,7 @@ button:hover {
     margin: 1vw 0; /* Use viewport units for margin */
     gap: 1vw; /* Use viewport units for gap */
     flex-wrap: wrap; /* Allow wrapping for better fit */
+    min-width: 300px; /* Ensure minimum width for containers */
 }
 
 /* Cup Container Styling */
@@ -150,6 +151,8 @@ button:hover {
     margin: 0 1vw; /* Use viewport units for margin */
     position: relative;
     transition: border-color 0.3s ease; /* Smooth transition for border color */
+    min-width: 80px; /* Ensure minimum width for slots */
+    min-height: 110px; /* Ensure minimum height for slots */
 }
 
 .cup-slot.highlight {
@@ -204,7 +207,7 @@ button:hover {
 }
 
 .modal p {
-    font-size: 1.5vw; /* Use viewport units for font size */
+    font-size: 1.5vw; /* Increased font size for readability */
     margin-bottom: 2vw; /* Use viewport units for margin */
 }
 
@@ -244,7 +247,7 @@ button:hover {
 }
 
 #instructions-modal p {
-    font-size: 1.5vw; /* Use viewport units for font size */
+    font-size: 1.5vw; /* Increased font size for readability */
     margin-bottom: 2vw; /* Use viewport units for margin */
 }
 
@@ -265,26 +268,26 @@ button:hover {
     }
 
     h1 {
-        font-size: 50px;
+        font-size: 8vw; /* Adjust font size */
     }
 
     button {
-        font-size: 1rem;
-        padding: 10px 20px;
+        font-size: 1.2vw; /* Adjust font size */
+        padding: 1.5vw 3vw; /* Adjust padding */
     }
 
     .cup {
-        width: 80px;
-        height: 70px;
+        width: 12vw; /* Adjust width */
+        height: 10vw; /* Adjust height */
     }
 
     .cup-slot {
-        width: 80px;
-        height: 110px;
+        width: 12vw; /* Adjust width */
+        height: 16vw; /* Adjust height */
     }
 
     #level-info #level {
-        font-size: 2rem;
+        font-size: 3vw; /* Adjust font size */
     }
 }
 
@@ -295,30 +298,30 @@ button:hover {
     }
 
     h1 {
-        font-size: 40px;
+        font-size: 6vw; /* Adjust font size */
     }
 
     button {
-        font-size: 0.9rem;
-        padding: 8px 16px;
+        font-size: 1vw; /* Adjust font size */
+        padding: 1vw 2vw; /* Adjust padding */
     }
 
     .cup {
-        width: 70px;
-        height: 60px;
+        width: 10vw; /* Adjust width */
+        height: 8vw; /* Adjust height */
     }
 
     .cup-slot {
-        width: 70px;
-        height: 100px;
+        width: 10vw; /* Adjust width */
+        height: 14vw; /* Adjust height */
     }
 
     #level-info #level {
-        font-size: 1.8rem;
+        font-size: 2vw; /* Adjust font size */
     }
 
     #level-info #time-left {
-        font-size: 1.2rem;
+        font-size: 1.5vw; /* Adjust font size */
     }
 }
 
@@ -328,30 +331,29 @@ button:hover {
     }
 
     h1 {
-        font-size: 32px;
+        font-size: 5vw; /* Adjust font size */
     }
 
     button {
-        font-size: 0.8rem;
-        padding: 6px 12px;
+        font-size: 0.9vw; /* Adjust font size */
+        padding: 0.8vw 1.6vw; /* Adjust padding */
     }
 
     .cup {
-        width: 60px;
-        height: 50px;
+        width: 8vw; /* Adjust width */
+        height: 6vw; /* Adjust height */
     }
 
     .cup-slot {
-        width: 60px;
-        height: 90px;
+        width: 8vw; /* Adjust width */
+        height: 12vw; /* Adjust height */
     }
 
     #level-info #level {
-        font-size: 1.6rem;
+        font-size: 1.8vw; /* Adjust font size */
     }
 
     #level-info #time-left {
-        font-size: 1rem;
+        font-size: 1.2vw; /* Adjust font size */
     }
 }
-
