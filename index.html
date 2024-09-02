@@ -47,12 +47,13 @@
     </div>
 
     <script src="game.js"></script>
-
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const instructionsButton = document.getElementById('instructions-button');
             const instructionsModal = document.getElementById('instructions-modal');
             const closeInstructionsButton = document.getElementById('close-instructions');
+            const stackContainer = document.getElementById('stack-container');
+            const arrangementContainer = document.getElementById('arrangement-container');
 
             // Show the instructions modal when the instructions button is clicked
             instructionsButton.addEventListener('click', () => {
@@ -70,8 +71,39 @@
                     instructionsModal.style.display = 'none';
                 }
             });
+
+            // Function to adjust cup sizes and container scrolling
+            function adjustCupSize() {
+                const cups = document.querySelectorAll('.cup');
+                const maxCupsPerRow = Math.floor(window.innerWidth / 100); // Assuming each cup is ~100px wide
+
+                if (cups.length > maxCupsPerRow) {
+                    stackContainer.classList.add('too-many-cups');
+                    arrangementContainer.classList.add('too-many-cups');
+                } else {
+                    stackContainer.classList.remove('too-many-cups');
+                    arrangementContainer.classList.remove('too-many-cups');
+                }
+
+                // If the cups overflow even after resizing, make the container scrollable
+                if (stackContainer.scrollWidth > stackContainer.clientWidth) {
+                    stackContainer.classList.add('scrollable');
+                } else {
+                    stackContainer.classList.remove('scrollable');
+                }
+
+                if (arrangementContainer.scrollWidth > arrangementContainer.clientWidth) {
+                    arrangementContainer.classList.add('scrollable');
+                } else {
+                    arrangementContainer.classList.remove('scrollable');
+                }
+            }
+
+            // Call this function whenever you set up a new level
+            adjustCupSize();
+
+            window.addEventListener('resize', adjustCupSize); // Re-adjust on window resize
         });
     </script>
 </body>
 </html>
-

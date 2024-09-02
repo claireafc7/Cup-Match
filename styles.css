@@ -13,6 +13,7 @@ body {
     text-align: center;
     width: 100%;
     padding: 20px;
+    overflow: hidden; /* Prevent overflowing content */
 }
 
 /* Page Display */
@@ -83,15 +84,20 @@ button:hover {
     justify-content: center;
     margin: 20px 0;
     gap: 10px;
-    flex-wrap: wrap; /* Allow wrapping for better fit */
+    flex-wrap: wrap;
+    max-width: 100%;
+    overflow: hidden; /* Prevent overflowing containers */
+    padding: 10px;
 }
 
 /* Cup Container Styling */
 .cup-container {
     display: flex;
     gap: 10px;
-    flex-wrap: wrap; /* Enable wrapping on all screen sizes */
+    flex-wrap: wrap;
     justify-content: center;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 /* Cup Styling */
@@ -104,35 +110,37 @@ button:hover {
     clip-path: polygon(20% 0%, 80% 0%, 90% 100%, 10% 100%);
     margin: 0 auto;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transform and shadow transitions */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.cup::before {
-    content: '';
-    position: absolute;
-    top: -10px;
-    left: 10%;
-    width: 80%;
-    height: 6px;
-    border-radius: 8px 8px 0 0;
-    background-color: #B48A61;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+/* Responsive adjustments based on the number of cups */
+@media (min-width: 768px) {
+    .cup-container.too-many-cups .cup {
+        width: 80px;
+        height: 60px;
+    }
 }
 
-.cup::after {
-    content: '';
-    position: absolute;
-    bottom: -6px;
-    left: 30%;
-    width: 40%;
-    height: 12px;
-    background-color: #B48A61;
-    border-radius: 0 0 10px 10px;
+@media (max-width: 768px) {
+    .cup-container.too-many-cups .cup {
+        width: 70px;
+        height: 50px;
+    }
 }
 
-.cup.dragging {
-    transform: scale(1.1); /* Slightly scale up the cup when dragging */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4); /* Enhanced shadow during drag */
+@media (max-width: 480px) {
+    .cup-container.too-many-cups .cup {
+        width: 60px;
+        height: 40px;
+    }
+}
+
+/* For very small screens or too many cups, make the container scrollable */
+.cup-container.scrollable {
+    overflow-x: auto;
+    white-space: nowrap;
+    max-width: 100%;
+    padding: 10px;
 }
 
 /* Cup Slot Styling */
