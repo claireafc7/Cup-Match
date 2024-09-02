@@ -7,15 +7,12 @@ body {
     height: 100vh;
     margin: 0;
     background-color: whitesmoke;
-    overflow: hidden; /* Prevent body overflow */
 }
 
 .page {
     text-align: center;
     width: 100%;
     padding: 20px;
-    box-sizing: border-box; /* Ensures padding does not affect width */
-    overflow: hidden; /* Prevent content overflow */
 }
 
 /* Page Display */
@@ -28,7 +25,6 @@ body {
 
 #game-page {
     display: none;
-    overflow: auto; /* Enable scrolling on game page */
 }
 
 /* Heading Styling */
@@ -84,30 +80,24 @@ button:hover {
 /* Stack and Arrangement Containers */
 #stack-container, #arrangement-container {
     display: flex;
-    flex-direction: column; /* Stack vertically on mobile */
     justify-content: center;
     margin: 20px 0;
     gap: 10px;
-    flex-wrap: nowrap; /* Prevent wrapping, vertical scrolling will be used */
-    overflow-y: auto; /* Enable vertical scrolling */
-    max-height: 60vh; /* Limit height to prevent overflow */
+    flex-wrap: wrap; /* Allow wrapping for better fit */
 }
 
 /* Cup Container Styling */
 .cup-container {
     display: flex;
     gap: 10px;
-    flex-direction: column; /* Stack vertically */
-    flex-wrap: nowrap; /* Prevent wrapping */
+    flex-wrap: wrap; /* Enable wrapping on all screen sizes */
     justify-content: center;
-    overflow-y: auto; /* Enable vertical scrolling */
-    max-height: 60vh; /* Limit height to prevent overflow */
 }
 
 /* Cup Styling */
 .cup {
-    width: 80px; /* Adjusted size for better fit on mobile */
-    height: 60px;
+    width: 100px;
+    height: 80px;
     background-color: #B48A61;
     position: relative;
     border: 2px solid #8B5E3C;
@@ -147,7 +137,7 @@ button:hover {
 
 /* Cup Slot Styling */
 .cup-slot {
-    width: 80px; /* Adjusted size for better fit on mobile */
+    width: 100px;
     height: 130px;
     background-color: #eee;
     border: 2px solid #aaa;
@@ -167,11 +157,6 @@ button:hover {
 /* Game Page Styling */
 #level-info {
     margin: 20px 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow: auto; /* Allows scrolling if content overflows */
-    width: 100%; /* Ensure it takes full width */
 }
 
 #level-info span {
@@ -181,10 +166,6 @@ button:hover {
 #level-info #level {
     font-size: 2.5rem;
     transition: font-size 0.3s ease; /* Smooth font size transition */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis; /* Ensures text is truncated with ellipsis if it overflows */
-    text-align: center; /* Center the text */
 }
 
 #level-info #time-left {
@@ -349,20 +330,11 @@ button:hover {
         height: 90px;
     }
 
-    #level-info {
-        font-size: 0.7rem; /* Further reduced font size */
-        padding: 5px; /* Adjust padding for very small screens */
-        overflow: auto; /* Enable scrolling for level info */
-    }
-
     #level-info #level {
-        font-size: 1.4rem; /* Further reduced font size */
+        font-size: 1.6rem;
     }
 
     #level-info #time-left {
         font-size: 1rem;
     }
 }
-
-
-
