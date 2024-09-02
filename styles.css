@@ -166,6 +166,13 @@ button:hover {
 #level-info #level {
     font-size: 2.5rem;
     transition: font-size 0.3s ease; /* Smooth font size transition */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Ensures text is truncated with ellipsis if it overflows */
+}
+
+.level-overflow {
+    font-size: 0.9em; /* Reduce font size if text overflows */
 }
 
 #level-info #time-left {
@@ -338,4 +345,3 @@ button:hover {
         font-size: 1rem;
     }
 }
-

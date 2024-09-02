@@ -68,8 +68,14 @@ function startLevel() {
 }
 
 function updateLevelInfo(levelData) {
-    document.getElementById('level').innerText = `Level ${currentLevel + 1}`;
-    document.getElementById('time-left').innerText = levelData.timeLimit;
+    const levelElement = document.getElementById('level');
+    levelElement.innerText = `Level ${currentLevel + 1}`;
+
+    // Ensure that the level number fits within its container
+    levelElement.classList.remove('level-overflow');
+    if (levelElement.scrollWidth > levelElement.clientWidth) {
+        levelElement.classList.add('level-overflow');
+    }
 }
 
 function generateCups(totalCupCount, actualCupCount, duplicateColors = 0) {
@@ -77,17 +83,21 @@ function generateCups(totalCupCount, actualCupCount, duplicateColors = 0) {
         "#A633FF", "#FF8C33", "#FF3333", "#8CFF33", "#33FFA2", "#3339FF",
         "#FFC733", "#33D1FF", "#FF33D6", "#FF5733", "#B833FF", "#33FF8F",
         "#FF33F6", "#FF9633"];
-    let selectedColors = colors.slice(0, actualCupCount - duplicateColors);
 
-    // Add duplicate colors
-    for (let i = 0; i < duplicateColors; i++) {
-        selectedColors.push(selectedColors[Math.floor(Math.random() * selectedColors.length)]);
+    const allColors = [...colors];
+    const selectedColors = allColors.slice(0, actualCupCount - duplicateColors);
+
+    // Generate cups with duplicate colors
+    const cups = [];
+    for (let i = 0; i < actualCupCount; i++) {
+        cups.push({ color: selectedColors[i % selectedColors.length], id: i });
     }
 
-    // Generate cups with colors
-    const cups = [];
-    for (let i = 0; i < totalCupCount; i++) {
-        cups.push({ color: selectedColors[i % selectedColors.length], id: i });
+    // Add extra cups with unique colors
+    const uniqueColors = allColors.filter(color => !selectedColors.includes(color));
+    for (let i = 0; i < totalCupCount - actualCupCount; i++) {
+        if (uniqueColors.length === 0) break; // If we run out of unique colors
+        cups.push({ color: uniqueColors[i % uniqueColors.length], id: actualCupCount + i });
     }
 
     return shuffleArray(cups);
@@ -335,4 +345,3 @@ function showInstructions() {
 function closeModal(modal) {
     modal.style.display = 'none';
 }
-
