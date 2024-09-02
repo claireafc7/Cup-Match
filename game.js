@@ -78,10 +78,12 @@ function startLevel() {
 
     const totalCups = levelData.cupCount + (levelData.extraCups || 0);
     shuffledCups = generateCups(totalCups, levelData.cupCount, levelData.duplicateColors || 0, levelData.extraCups || 0);
-    correctOrder = shuffledCups.slice(0, levelData.cupCount); // First N cups are the correct order
+
+    // Randomize the correct order
+    correctOrder = shuffleArray([...shuffledCups].slice(0, levelData.cupCount));
 
     displayCupsInStack(shuffledCups);
-    createCupSlots(levelData.cupCount); // Create slots based on the cup count
+    createCupSlots(levelData.cupCount);
 
     startTimer(levelData.timeLimit);
 }
@@ -92,26 +94,10 @@ function updateLevelInfo(levelData) {
 }
 
 function generateCups(totalCupCount, actualCupCount, duplicateColors = 0, extraCups = 0) {
-    const colors = ["#FF5733",
-        "#33FF57", 
-        "#3357FF",
-        "#FF33A6",
-        "#FFFF33",
-        "#33FFF5",
-        "#A633FF", 
-        "#FF8C33", 
-        "#FF3333",
-        "#8CFF33", 
-        "#33FFA2", 
-        "#3339FF", 
-        "#FFC733", 
-        "#33D1FF", 
-        "#FF33D6", 
-        "#FF5733", 
-        "#B833FF", 
-        "#33FF8F", 
-        "#FF33F6", 
-        "#FF9633"];
+    const colors = ["#FF5733", "#33FF57", "#3357FF", "#FF33A6", "#FFFF33", "#33FFF5",
+        "#A633FF", "#FF8C33", "#FF3333", "#8CFF33", "#33FFA2", "#3339FF",
+        "#FFC733", "#33D1FF", "#FF33D6", "#FF5733", "#B833FF", "#33FF8F",
+        "#FF33F6", "#FF9633"];
 
     // Step 1: Select Colors for the Main Cups
     let selectedColors = colors.slice(0, actualCupCount - duplicateColors);
@@ -187,7 +173,7 @@ function createCupElement(color, id) {
 
     // Event listeners for drag and touch actions
     cupElement.addEventListener('dragstart', dragStart);
-    cupElement.addEventListener('dragend', dragEnd); 
+    cupElement.addEventListener('dragend', dragEnd);
     cupElement.addEventListener('click', returnCupToStack);
     addTouchEvents(cupElement);
 
@@ -218,100 +204,92 @@ function dragOver(event) {
 }
 
 function drop(event) {
-    event.preventDefault();
     if (isPaused) return;
-    const targetSlot = event.target.closest('.cup-slot');
-
-    if (targetSlot && selectedCupElement) {
-        swapCups(targetSlot);
+    event.preventDefault();
+    if (selectedCupElement) {
+        const slot = event.target.closest('.cup-slot');
+        if (slot && !slot.querySelector('.cup')) {
+            slot.appendChild(selectedCupElement);
+            document.getElementById('check-arrangement').disabled = false; // Enable button when a cup is placed
+        }
     }
 }
 
-function swapCups(targetSlot) {
-    const targetCup = targetSlot.querySelector('.cup');
-
-    if (targetCup) {
-        selectedCupElement.parentElement.appendChild(targetCup); // Swap cups
-    }
-
-    targetSlot.appendChild(selectedCupElement);
-    selectedCupElement.classList.remove('dragging'); // Remove dragging class
-    selectedCupElement = null;
-
-    // Check if all slots are filled and enable the check button if true
-    checkIfAllSlotsFilled();
-}
-
-function checkIfAllSlotsFilled() {
-    const slots = document.querySelectorAll('.cup-slot');
-    const allFilled = [...slots].every(slot => slot.querySelector('.cup') !== null);
-
-    const checkButton = document.getElementById('check-arrangement');
-    checkButton.disabled = !allFilled; // Enable if all slots are filled, otherwise disable
-}
-
-// Touch Functions for Mobile
+// Touch Events Functions for Mobile
 function touchStart(event) {
     if (isPaused) return;
-    selectedCupElement = event.target;
-    selectedCupElement.classList.add('dragging'); // Visual feedback for touch
+    event.preventDefault();
+    const touch = event.touches[0];
+    selectedCupElement = touch.target;
+    selectedCupElement.classList.add('dragging');
 }
 
 function touchMove(event) {
     if (isPaused) return;
     event.preventDefault();
     const touch = event.touches[0];
-    const touchedElement = document.elementFromPoint(touch.clientX, touch.clientY);
-
-    if (touchedElement && touchedElement !== draggedOverElement) {
-        draggedOverElement = touchedElement;
+    if (selectedCupElement) {
+        selectedCupElement.style.position = 'absolute';
+        selectedCupElement.style.left = `${touch.clientX - selectedCupElement.offsetWidth / 2}px`;
+        selectedCupElement.style.top = `${touch.clientY - selectedCupElement.offsetHeight / 2}px`;
     }
 }
 
 function touchEnd(event) {
     if (isPaused) return;
-    const targetSlot = draggedOverElement.closest('.cup-slot');
-
-    if (targetSlot && selectedCupElement) {
-        swapCups(targetSlot);
+    event.preventDefault();
+    if (selectedCupElement) {
+        const slot = document.elementFromPoint(event.changedTouches[0].clientX, event.changedTouches[0].clientY);
+        if (slot && slot.classList.contains('cup-slot') && !slot.querySelector('.cup')) {
+            slot.appendChild(selectedCupElement);
+            document.getElementById('check-arrangement').disabled = false; // Enable button when a cup is placed
+        }
+        selectedCupElement.classList.remove('dragging');
+        selectedCupElement.style.position = '';
+        selectedCupElement = null;
     }
-
-    selectedCupElement.classList.remove('dragging');
-    selectedCupElement = null;
 }
 
-// Timer Functions
+function returnCupToStack(event) {
+    if (isPaused) return;
+    const cupElement = event.target;
+    if (cupElement.classList.contains('cup')) {
+        const stackContainer = document.getElementById('stack-container');
+        stackContainer.appendChild(cupElement);
+        document.getElementById('check-arrangement').disabled = true; // Disable button if cups are moved back to the stack
+    }
+}
+
 function startTimer(duration) {
-    let timeRemaining = duration;
-    const timeDisplay = document.getElementById('time-left');
-    timeDisplay.innerText = timeRemaining;
-
+    let timer = duration;
+    const timerDisplay = document.getElementById('time-left');
     timerInterval = setInterval(() => {
-        if (!isPaused) {
-            timeRemaining--;
-            timeDisplay.innerText = timeRemaining;
+        if (isPaused) return;
+        const minutes = Math.floor(timer / 60);
+        const seconds = timer % 60;
+        timerDisplay.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 
-            if (timeRemaining <= 0) {
-                clearInterval(timerInterval);
-                endLevel(false);
-            }
+        if (--timer < 0) {
+            clearInterval(timerInterval);
+            alert('Time is up! Game over.');
+            endGame();
         }
     }, 1000);
 }
 
 function togglePause() {
     isPaused = !isPaused;
-    const pauseButton = document.getElementById('pause-game');
-    pauseButton.innerText = isPaused ? 'Resume' : 'Pause';
-
-    const overlay = document.getElementById('pause-overlay');
-    overlay.style.display = isPaused ? 'block' : 'none';
+    const pauseOverlay = document.getElementById('pause-overlay');
+    pauseOverlay.style.display = isPaused ? 'block' : 'none';
+    document.getElementById('check-arrangement').disabled = isPaused; // Disable button during pause
 }
 
-function endGame() {
-    clearInterval(timerInterval);
-    alert('Game Over! Thanks for playing.');
-    switchToPage('home-page');
+function showInstructions() {
+    document.getElementById('instructions-modal').style.display = 'block';
+}
+
+function closeModal(modal) {
+    modal.style.display = 'none';
 }
 
 function checkArrangement() {
@@ -321,43 +299,42 @@ function checkArrangement() {
         return cupInSlot && parseInt(cupInSlot.getAttribute('data-cup-id')) === cup.id;
     });
 
-    clearInterval(timerInterval); // Stop the timer
-    endLevel(isCorrect);
+    clearInterval(timerInterval);
+    showResultModal(isCorrect);
 }
 
-function endLevel(isCorrect) {
-    const resultMessage = isCorrect ? 'Correct! Moving to the next level.' : 'Incorrect arrangement. Try again!';
-    alert(resultMessage);
+function showResultModal(isCorrect) {
+    const modal = document.getElementById('modal');
+    const modalMessage = document.getElementById('modal-message');
+
+    modalMessage.innerText = isCorrect ? 'Correct! Moving to the next level.' : 'Incorrect arrangement. Try again!';
+    modal.style.display = 'block';
 
     if (isCorrect) {
         currentLevel++;
         if (currentLevel < levels.length) {
-            startLevel();
+            setTimeout(() => {
+                closeModal(modal);
+                startLevel();
+            }, 2000); // Delay to show the message before starting the next level
         } else {
             alert('Congratulations! You completed all levels!');
             endGame();
         }
     } else {
-        startLevel(); // Restart the same level
+        setTimeout(() => {
+            closeModal(modal);
+            startLevel(); // Restart the same level
+        }, 2000); // Delay before restarting the level
     }
 }
 
-// Modal and Navigation Functions
-function showInstructions() {
-    document.getElementById('instructions-modal').style.display = 'block';
-}
-
-function closeModal(modal) {
-    modal.style.display = 'none';
+function endGame() {
+    switchToPage('main-page');
+    currentLevel = 0; // Reset the game state
 }
 
 function switchToPage(pageId) {
-    document.querySelectorAll('.page').forEach(page => page.style.display = 'none');
-    document.getElementById(pageId).style.display = 'block';
-}
-
-function returnCupToStack(event) {
-    const cup = event.target;
-    const stackContainer = document.getElementById('stack-container');
-    stackContainer.appendChild(cup);
+    document.getElementById('main-page').style.display = pageId === 'main-page' ? 'block' : 'none';
+    document.getElementById('game-page').style.display = pageId === 'game-page' ? 'block' : 'none';
 }
