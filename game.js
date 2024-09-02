@@ -1,9 +1,25 @@
 // Game Configuration and State Variables
 const levels = [
     { cupCount: 3, timeLimit: 60 },
+    { cupCount: 3, timeLimit: 45 },
+    { cupCount: 3, timeLimit: 30 },
+    { cupCount: 4, timeLimit: 60 },
+    { cupCount: 4, timeLimit: 45 },
+    { cupCount: 5, timeLimit: 60 },
+    { cupCount: 5, timeLimit: 45 },
+    { cupCount: 6, timeLimit: 60 },
+    { cupCount: 7, timeLimit: 60 },
+    { cupCount: 8, timeLimit: 60 },
+    { cupCount: 9, timeLimit: 60 },
+    { cupCount: 10, timeLimit: 60 },
+    { cupCount: 10, timeLimit: 75, duplicateColors: 2 },
+    { cupCount: 10, timeLimit: 75, duplicateColors: 4 },
     { cupCount: 12, timeLimit: 75, duplicateColors: 6 },
+    { cupCount: 12, timeLimit: 75, duplicateColors: 2 },
+    { cupCount: 12, timeLimit: 75, duplicateColors: 4 },
+    { cupCount: 10, timeLimit: 90, extraCups: 4 },
     { cupCount: 10, timeLimit: 90, extraCups: 6 },
-    { cupCount: 12, timeLimit: 75, duplicateColors: 6, killerCups: true }
+    { cupCount: 12, timeLimit: 90, extraCups: 4 }
 ];
 
 let currentLevel = 0;
@@ -46,7 +62,7 @@ function startLevel() {
     updateLevelInfo(levelData);
 
     const totalCups = levelData.cupCount + (levelData.extraCups || 0);
-    shuffledCups = generateCups(totalCups, levelData.cupCount, levelData.duplicateColors || 0, levelData.killerCups || false);
+    shuffledCups = generateCups(totalCups, levelData.cupCount, levelData.duplicateColors || 0);
     correctOrder = shuffledCups.slice(0, levelData.cupCount); // First N cups are the correct order
 
     displayCupsInStack(shuffledCups);
@@ -60,8 +76,27 @@ function updateLevelInfo(levelData) {
     document.getElementById('time-left').innerText = levelData.timeLimit;
 }
 
-function generateCups(totalCupCount, actualCupCount, duplicateColors = 0, hasKillerCups = false) {
-    const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown', 'beige', 'teal', 'black', 'white', 'cyan', 'lilac', 'burlywood', 'gold', 'grey'];
+function generateCups(totalCupCount, actualCupCount, duplicateColors = 0) {
+    const colors = [ 'crimson',
+        'navy',
+        'turquoise',
+        'salmon',
+        'coral',
+        'goldenrod',
+        'indigo',
+        'lavender',
+        'aqua',
+        'khaki',
+        'chocolate',
+        'peru',
+        'slateblue',
+        'tomato',
+        'darkcyan',
+        'orchid',
+        'seagreen',
+        'sandybrown',
+        'plum',
+        'steelblue'];
     let selectedColors = colors.slice(0, actualCupCount - duplicateColors);
 
     // Add duplicate colors
@@ -69,16 +104,10 @@ function generateCups(totalCupCount, actualCupCount, duplicateColors = 0, hasKil
         selectedColors.push(selectedColors[Math.floor(Math.random() * selectedColors.length)]);
     }
 
-    // Generate cups with colors and types
+    // Generate cups with colors
     const cups = [];
-    const killerCupCount = hasKillerCups ? Math.floor(totalCupCount * 0.1) : 0; // 10% of the total cups are killer cups
     for (let i = 0; i < totalCupCount; i++) {
-        const isKiller = i < killerCupCount;
-        cups.push({
-            color: selectedColors[i % selectedColors.length],
-            id: i,
-            type: isKiller ? 'killer' : 'normal'
-        });
+        cups.push({ color: selectedColors[i % selectedColors.length], id: i });
     }
 
     return shuffleArray(cups);
@@ -93,7 +122,7 @@ function displayCupsInStack(cups) {
     stackContainer.innerHTML = ''; // Clear previous cups
 
     cups.forEach(cup => {
-        const cupElement = createCupElement(cup.color, cup.id, cup.type);
+        const cupElement = createCupElement(cup.color, cup.id);
         stackContainer.appendChild(cupElement);
     });
 }
@@ -117,9 +146,9 @@ function createCupSlotElement(index) {
     return slotElement;
 }
 
-function createCupElement(color, id, type) {
+function createCupElement(color, id) {
     const cupElement = document.createElement('div');
-    cupElement.className = `cup ${type}`; // Add type to class
+    cupElement.className = 'cup';
     cupElement.style.backgroundColor = color;
     cupElement.setAttribute('draggable', true);
     cupElement.setAttribute('data-cup-id', id); // Unique ID for each cup

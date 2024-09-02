@@ -15,28 +15,20 @@
     </div>
 
     <!-- Game Page -->
-    <div id="game-page" class="page">
+    <div id="game-page" class="page" style="display: none;">
         <div id="level-info">
             <span id="level">Level 1</span>
             <span id="time-left">60</span> seconds
         </div>
-        <div id="stack-container" class="cup-container">
-            <!-- Example cup elements for stack -->
-            <!-- <div class="cup" data-cup-type="normal"></div> -->
-            <!-- <div class="cup" data-cup-type="killer"></div> -->
-        </div>
-        <div id="arrangement-container" class="cup-container">
-            <!-- Example cup elements for arrangement -->
-            <!-- <div class="cup" data-cup-type="normal"></div> -->
-            <!-- <div class="cup" data-cup-type="killer"></div> -->
-        </div>
+        <div id="stack-container" class="cup-container"></div>
+        <div id="arrangement-container" class="cup-container"></div>
         <button id="check-arrangement">Check Arrangement</button>
         <button id="pause-game" class="pause-button">Pause Game</button>
         <button id="end-game">End Game</button>
     </div>
 
     <!-- Modal for Instructions -->
-    <div id="instructions-modal" class="modal">
+    <div id="instructions-modal" class="modal" style="display: none;">
         <div class="modal-content">
             <h2>How to Play</h2>
             <p>1. The cups need to be arranged in a specific order.</p>
@@ -49,11 +41,9 @@
     </div>
 
     <!-- General Modal -->
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <p>Modal message goes here.</p>
-            <button id="modal-close">Close</button>
-        </div>
+    <div id="modal" class="modal" style="display: none;">
+        <p>Modal message goes here.</p>
+        <button id="modal-close">Close</button>
     </div>
 
     <script src="game.js"></script>
@@ -80,22 +70,8 @@
                     instructionsModal.style.display = 'none';
                 }
             });
-
-            // Handle general modal close functionality
-            const modalCloseButton = document.getElementById('modal-close');
-            const generalModal = document.getElementById('modal');
-
-            modalCloseButton.addEventListener('click', () => {
-                generalModal.style.display = 'none';
-            });
-
-            // Close the general modal if the user clicks outside of it
-            window.addEventListener('click', (event) => {
-                if (event.target == generalModal) {
-                    generalModal.style.display = 'none';
-                }
-            });
         });
     </script>
 </body>
 </html>
+
