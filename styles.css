@@ -161,7 +161,7 @@ button:hover {
     display: flex;
     flex-direction: column;
     align-items: center;
-    overflow: hidden; /* Hide overflow text */
+    overflow: auto; /* Allows scrolling if content overflows */
     width: 100%; /* Ensure it takes full width */
 }
 
@@ -175,6 +175,7 @@ button:hover {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis; /* Ensures text is truncated with ellipsis if it overflows */
+    text-align: center; /* Center the text */
 }
 
 #level-info #time-left {
@@ -310,8 +311,16 @@ button:hover {
         height: 100px;
     }
 
+    #level-info {
+        font-size: 0.8rem; /* Smaller font size for mobile */
+        padding: 10px; /* Adjust padding */
+    }
+
     #level-info #level {
-        font-size: 1.8rem;
+        font-size: 1.6rem; /* Smaller font size */
+        white-space: normal; /* Allow text to wrap */
+        text-overflow: clip; /* Remove ellipsis */
+        overflow: visible; /* Ensure full text is visible */
     }
 
     #level-info #time-left {
@@ -339,12 +348,18 @@ button:hover {
         height: 90px;
     }
 
+    #level-info {
+        font-size: 0.7rem; /* Further reduced font size */
+        padding: 5px; /* Adjust padding for very small screens */
+    }
+
     #level-info #level {
-        font-size: 1.6rem;
+        font-size: 1.4rem; /* Further reduced font size */
     }
 
     #level-info #time-left {
         font-size: 1rem;
     }
 }
+
 
