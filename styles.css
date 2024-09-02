@@ -13,6 +13,7 @@ body {
     text-align: center;
     width: 100%;
     padding: 20px;
+    box-sizing: border-box; /* Ensures padding does not affect width */
 }
 
 /* Page Display */
@@ -157,6 +158,11 @@ button:hover {
 /* Game Page Styling */
 #level-info {
     margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden; /* Hide overflow text */
+    width: 100%; /* Ensure it takes full width */
 }
 
 #level-info span {
@@ -169,10 +175,6 @@ button:hover {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis; /* Ensures text is truncated with ellipsis if it overflows */
-}
-
-.level-overflow {
-    font-size: 0.9em; /* Reduce font size if text overflows */
 }
 
 #level-info #time-left {
@@ -345,3 +347,4 @@ button:hover {
         font-size: 1rem;
     }
 }
+
