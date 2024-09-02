@@ -7,7 +7,6 @@ body {
     height: 100vh;
     margin: 0;
     background-color: whitesmoke;
-    overflow-x: auto; /* Enable horizontal scrolling if needed */
 }
 
 .page {
@@ -26,7 +25,6 @@ body {
 
 #game-page {
     display: none;
-    overflow: auto; /* Allow scrolling if content overflows */
 }
 
 /* Heading Styling */
@@ -284,16 +282,6 @@ button:hover {
 
 /* Responsive Design for Mobile Devices */
 @media (max-width: 768px) {
-    body {
-        overflow-x: auto; /* Ensure horizontal scrolling on small screens */
-    }
-
-    #game-page {
-        transform: scale(0.8); /* Scale down content */
-        transform-origin: top left; /* Scale from top-left corner */
-        width: 125%; /* Ensure content fits */
-    }
-
     h1 {
         font-size: 40px;
     }
@@ -323,12 +311,6 @@ button:hover {
 }
 
 @media (max-width: 480px) {
-    #game-page {
-        transform: scale(0.7); /* Further scale down content */
-        transform-origin: top left;
-        width: 143%; /* Ensure content fits */
-    }
-
     h1 {
         font-size: 32px;
     }
