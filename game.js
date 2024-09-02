@@ -87,7 +87,7 @@ function startLevel() {
 
 function updateLevelInfo(levelData) {
     const levelElement = document.getElementById('level');
-    levelElement.innerText = Level ${currentLevel + 1};
+    levelElement.innerText = `Level ${currentLevel + 1}`;
 
     // Ensure that the level number fits within its container
     levelElement.classList.remove('level-overflow');
@@ -268,7 +268,7 @@ function checkArrangement() {
     if (correctCount === correctOrder.length) {
         handleLevelCompletion();
     } else {
-        showModal(${correctCount} out of ${correctOrder.length} cups are correct. Try again!);
+        showModal(`${correctCount} out of ${correctOrder.length} cups are correct. Try again!`);
     }
 }
 
@@ -281,7 +281,7 @@ function getArrangedCups() {
 
 function calculateCorrectCups(arrangedCups) {
     return arrangedCups.reduce((count, color, index) => {
-        const cupId = document.querySelector([data-cup-id="${index}"])?.style.backgroundColor;
+        const cupId = document.querySelector(`[data-cup-id="${index}"]`)?.style.backgroundColor;
         return count + (color === cupId ? 1 : 0);
     }, 0);
 }
