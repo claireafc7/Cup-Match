@@ -139,8 +139,8 @@ button:hover {
 
 /* Cup Slot Styling */
 .cup-slot {
-    width: 18vw; /* Adjusted width for responsive design */
-    height: 20vw; /* Adjusted height for responsive design */
+    width: 22vw; /* Adjusted width for 4 slots in a row */
+    height: 25vw; /* Adjusted height for proportional scaling */
     background-color: #eee;
     border: 2px solid #aaa;
     border-radius: 10px;
@@ -281,8 +281,8 @@ button:hover {
     }
 
     .cup-slot {
-        width: 18vw; /* Adjust width */
-        height: 20vw; /* Adjust height */
+        width: 22vw; /* Adjust width */
+        height: 25vw; /* Adjust height */
     }
 
     #level-info #level {
@@ -292,8 +292,12 @@ button:hover {
 
 /* Responsive Design for Mobile Devices */
 @media (max-width: 768px) {
+    body {
+        overflow: auto; /* Enable scrolling on mobile devices */
+    }
+
     h1 {
-        font-size: 8vw; /* Adjust font size */
+        font-size: 10vw; /* Adjust font size */
     }
 
     button {
@@ -307,8 +311,8 @@ button:hover {
     }
 
     .cup-slot {
-        width: 18vw; /* Adjust width */
-        height: 20vw; /* Adjust height */
+        width: 22vw; /* Adjust width */
+        height: 25vw; /* Adjust height */
     }
 
     #level-info #level {
@@ -321,6 +325,10 @@ button:hover {
 }
 
 @media (max-width: 480px) {
+    body {
+        overflow: auto; /* Enable scrolling on small mobile devices */
+    }
+
     h1 {
         font-size: 6vw; /* Adjust font size */
     }
@@ -348,3 +356,4 @@ button:hover {
         font-size: 1.2rem; /* Adjust font size */
     }
 }
+
