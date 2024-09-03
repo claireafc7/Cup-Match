@@ -84,23 +84,23 @@ button:hover {
 #stack-container, #arrangement-container {
     display: flex;
     justify-content: center;
-    margin: 10px 0;
-    gap: 5px;
+    margin: 20px 0;
+    gap: 10px;
     flex-wrap: wrap; /* Allow wrapping for better fit */
 }
 
 /* Cup Container Styling */
 .cup-container {
     display: flex;
-    gap: 5px;
+    gap: 10px;
     flex-wrap: wrap; /* Enable wrapping on all screen sizes */
     justify-content: center;
 }
 
 /* Cup Styling */
 .cup {
-    width: 50px; /* Adjusted */
-    height: 40px; /* Adjusted */
+    width: 90px; /* Reduced size */
+    height: 70px; /* Reduced size */
     background-color: #B48A61;
     position: relative;
     border: 2px solid #8B5E3C;
@@ -113,10 +113,10 @@ button:hover {
 .cup::before {
     content: '';
     position: absolute;
-    top: -10px;
+    top: -8px; /* Adjusted to fit new size */
     left: 10%;
     width: 80%;
-    height: 6px;
+    height: 5px;
     border-radius: 8px 8px 0 0;
     background-color: #B48A61;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -125,10 +125,10 @@ button:hover {
 .cup::after {
     content: '';
     position: absolute;
-    bottom: -6px;
+    bottom: -5px;
     left: 30%;
     width: 40%;
-    height: 12px;
+    height: 10px;
     background-color: #B48A61;
     border-radius: 0 0 10px 10px;
 }
@@ -140,8 +140,8 @@ button:hover {
 
 /* Cup Slot Styling */
 .cup-slot {
-    width: 50px; /* Adjusted */
-    height: 65px; /* Adjusted */
+    width: 90px; /* Reduced size */
+    height: 120px; /* Reduced size */
     background-color: #eee;
     border: 2px solid #aaa;
     border-radius: 10px;
@@ -269,13 +269,13 @@ button:hover {
     }
 
     .cup {
-        width: 40px;
-        height: 35px;
+        width: 70px; /* Adjusted for tablets */
+        height: 60px; /* Adjusted for tablets */
     }
 
     .cup-slot {
-        width: 40px;
-        height: 55px;
+        width: 70px; /* Adjusted for tablets */
+        height: 100px; /* Adjusted for tablets */
     }
 
     #level-info #level {
@@ -295,13 +295,13 @@ button:hover {
     }
 
     .cup {
-        width: 60px; /* Slightly wider cup for mobile */
-        height: 50px;
+        width: 60px; /* Further reduced for mobile */
+        height: 50px; /* Further reduced for mobile */
     }
 
     .cup-slot {
-        width: 80px; /* Larger cup slot for mobile */
-        height: 100px;
+        width: 60px; /* Further reduced for mobile */
+        height: 90px; /* Further reduced for mobile */
     }
 
     #level-info #level {
@@ -324,13 +324,13 @@ button:hover {
     }
 
     .cup {
-        width: 70px; /* Even wider cup for smaller mobile screens */
-        height: 60px;
+        width: 50px; /* Further reduced for smaller mobile screens */
+        height: 40px; /* Further reduced for smaller mobile screens */
     }
 
     .cup-slot {
-        width: 90px; /* Larger cup slot for smaller mobile screens */
-        height: 110px;
+        width: 50px; /* Further reduced for smaller mobile screens */
+        height: 80px; /* Further reduced for smaller mobile screens */
     }
 
     #level-info #level {
