@@ -97,26 +97,29 @@ function updateLevelInfo(levelData) {
 }
 
 function generateCups(totalCupCount, actualCupCount, duplicateColors = 0) {
-    const colors = [
-        "#FF5733",  // Vivid Orange
-        "#33FF57",  // Bright Green
-        "#3357FF",  // Vivid Blue
-        "#FF33A8",  // Magenta Pink
-        "#FFDB33",  // Bright Yellow
-        "#33FFF6",  // Aqua
-        "#9D33FF",  // Purple
-        "#FF5733",  // Orange
-        "#33FF77",  // Light Green
-        "#FF5733",  // Red Orange
-        "#33D4FF",  // Sky Blue
-        "#FFA733",  // Deep Orange
-        "#FF333F",  // Coral Red
-        "#33FFAA",  // Mint Green
-        "#C633FF",  // Violet
-        "#FF33C4",  // Hot Pink
-        "#FFD433",  // Golden Yellow
-        "#3374FF",  // Bright Blue
-        "#A833FF",  // Soft purple
+    const colors = ["#FFFFFF",
+        "#E51B1B",
+        "#2E2E2E", 
+        "#B3AC4D",  
+        "#F5AF93",  
+        "#8ABA5A",  
+        "#28EC8F", 
+        "#65E5FF",  
+        "#80FA06",  
+        "#008CA8", 
+        "#0624A2", 
+        "#394073",  
+        "#565656",  
+        "#6B3D6F",  
+        "#A768AC",  
+        "#E254C7",  
+        "#F7AFFF",  
+        "#D17A05",  
+        "#F90101",  
+        "#000000"   
+       
+        
+        
     ];
 
     const allColors = [...colors];
