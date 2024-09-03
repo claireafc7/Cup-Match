@@ -295,13 +295,13 @@ button:hover {
     }
 
     .cup {
-        width: 50px;
-        height: 40px;
+        width: 60px; /* Slightly wider cup for mobile */
+        height: 50px;
     }
 
     .cup-slot {
-        width: 70px;
-        height: 90px;
+        width: 80px; /* Larger cup slot for mobile */
+        height: 100px;
     }
 
     #level-info #level {
@@ -324,13 +324,13 @@ button:hover {
     }
 
     .cup {
-        width: 50px;
-        height: 40px;
+        width: 70px; /* Even wider cup for smaller mobile screens */
+        height: 60px;
     }
 
     .cup-slot {
-        width: 70px;
-        height: 90px;
+        width: 90px; /* Larger cup slot for smaller mobile screens */
+        height: 110px;
     }
 
     #level-info #level {
@@ -341,4 +341,3 @@ button:hover {
         font-size: 1rem;
     }
 }
-
