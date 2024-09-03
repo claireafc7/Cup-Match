@@ -1,5 +1,5 @@
 const levels = [
-    { cupCount: 20, timeLimit: 60 },
+    { cupCount: 2, timeLimit: 60 },
     { cupCount: 3, timeLimit: 60 },
     { cupCount: 4, timeLimit: 60 },
     { cupCount: 5, timeLimit: 60 },
@@ -7,18 +7,18 @@ const levels = [
     { cupCount: 3, timeLimit: 45 },
     { cupCount: 4, timeLimit: 45 },
     { cupCount: 5, timeLimit: 45 },
-    { cupCount: 7, timeLimit: 60 },
-    { cupCount: 8, timeLimit: 60 },
+    { cupCount: 7, timeLimit: 90 },
+    { cupCount: 8, timeLimit: 90 },
     { cupCount: 9, timeLimit: 90 },
-    { cupCount: 10, timeLimit: 90 },
-    { cupCount: 11, timeLimit: 90 },
-    { cupCount: 12, timeLimit: 90 },
-    { cupCount: 9, timeLimit: 60 },
-    { cupCount: 10, timeLimit: 75, duplicateColors: 3 },
-    { cupCount: 10, timeLimit: 75, duplicateColors: 5 },
-    { cupCount: 11, timeLimit: 75, duplicateColors: 4 },
-    { cupCount: 12, timeLimit: 75, duplicateColors: 4 },
-    { cupCount: 12, timeLimit: 75, duplicateColors: 6 },
+    { cupCount: 10, timeLimit: 120 },
+    { cupCount: 11, timeLimit: 120 },
+    { cupCount: 12, timeLimit: 120 },
+    { cupCount: 9, timeLimit: 75 },
+    { cupCount: 10, timeLimit: 100, duplicateColors: 3 },
+    { cupCount: 10, timeLimit: 100, duplicateColors: 5 },
+    { cupCount: 11, timeLimit: 100, duplicateColors: 4 },
+    { cupCount: 12, timeLimit: 100, duplicateColors: 4 },
+    { cupCount: 12, timeLimit: 100, duplicateColors: 6 },
     { cupCount: 12, timeLimit: 100, extraCups: 2 },
     { cupCount: 12, timeLimit: 100, extraCups: 3 },
     { cupCount: 12, timeLimit: 100, extraCups: 5 },
@@ -97,10 +97,27 @@ function updateLevelInfo(levelData) {
 }
 
 function generateCups(totalCupCount, actualCupCount, duplicateColors = 0) {
-    const colors = ["#FF5733", "#33FF57", "#3357FF", "#FF33A6", "#FFFF33", "#33FFF5",
-        "#A633FF", "#FF8C33", "#FF3333", "#8CFF33", "#33FFA2", "#3339FF",
-        "#FFC733", "#33D1FF", "#FF33D6", "#FF5733", "#B833FF", "#33FF8F",
-        "#FF33F6", "#FF9633"];
+    const colors = [
+        "#FF5733",  // Vivid Orange
+        "#33FF57",  // Bright Green
+        "#3357FF",  // Vivid Blue
+        "#FF33A8",  // Magenta Pink
+        "#FFDB33",  // Bright Yellow
+        "#33FFF6",  // Aqua
+        "#9D33FF",  // Purple
+        "#FF5733",  // Orange
+        "#33FF77",  // Light Green
+        "#FF5733",  // Red Orange
+        "#33D4FF",  // Sky Blue
+        "#FFA733",  // Deep Orange
+        "#FF333F",  // Coral Red
+        "#33FFAA",  // Mint Green
+        "#C633FF",  // Violet
+        "#FF33C4",  // Hot Pink
+        "#FFD433",  // Golden Yellow
+        "#3374FF",  // Bright Blue
+        "#A833FF",  // Soft purple
+    ];
 
     const allColors = [...colors];
     const selectedColors = allColors.slice(0, actualCupCount - duplicateColors);

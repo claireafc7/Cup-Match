@@ -286,7 +286,7 @@ button:hover {
 /* Responsive Design for Mobile Devices */
 @media (max-width: 768px) {
     h1 {
-        font-size: 40px;
+        font-size: 80px;
     }
 
     button {
@@ -315,7 +315,7 @@ button:hover {
 
 @media (max-width: 480px) {
     h1 {
-        font-size: 32px;
+        font-size: 64px;
     }
 
     button {
