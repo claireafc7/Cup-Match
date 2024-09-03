@@ -296,7 +296,7 @@ button:hover {
 
     .cup {
         width: 50px;
-        height: 45px;
+        height: 40px;
     }
 
     .cup-slot {
@@ -324,13 +324,13 @@ button:hover {
     }
 
     .cup {
-        width: 30px;
-        height: px25;
+        width: 50px;
+        height: 40px;
     }
 
     .cup-slot {
-        width: 30px;
-        height: 45px;
+        width: 70px;
+        height: 90px;
     }
 
     #level-info #level {
