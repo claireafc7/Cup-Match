@@ -97,26 +97,26 @@ function updateLevelInfo(levelData) {
 }
 
 function generateCups(totalCupCount, actualCupCount, duplicateColors = 0) {
-    const colors = ["#FFFFFF",
-        "#E51B1B",
-        "#2E2E2E", 
-        "#B3AC4D",  
-        "#F5AF93",  
-        "#8ABA5A",  
-        "#28EC8F", 
-        "#65E5FF",  
-        "#80FA06",  
-        "#008CA8", 
-        "#0624A2", 
-        "#394073",  
-        "#565656",  
-        "#6B3D6F",  
-        "#A768AC",  
-        "#E254C7",  
-        "#F7AFFF",  
-        "#D17A05",  
-        "#F90101",  
-        "#000000"   
+    const colors = ["#F5AF93",
+"#80FA06",
+"#394073",
+"#F7AFFF",
+"#A768AC",
+"#E254C7",
+"#0624A2",
+"#B3AC4D",
+"#F90101",
+"#2E2E2E",
+"#8ABA5A",
+"#65E5FF",
+"#000000",
+"#E51B1B",
+"#6B3D6F",
+"#565656",
+"#D17A05",
+"#28EC8F",
+"#008CA8",
+"#FFFFFF"  
        
         
         
